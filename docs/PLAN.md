@@ -1,0 +1,30 @@
+# Implementation plan
+
+Each phase ends with a build the test user loads unpacked in Edge and uses on real articles.
+
+| #   | Phase                    | Deliverable                                                                       | Status |
+| --- | ------------------------ | --------------------------------------------------------------------------------- | ------ |
+| 0   | Setup                    | WXT + React + TS scaffold, on-demand injection, Shadow DOM shell, CI, license     | ✅     |
+| 1   | Focus View               | Readability extraction, reader layout, typography & themes, popup controls        | ⏳     |
+| 2   | Anchor marker & progress | Last-read paragraph marker (saved per page), progress bar, time left              |        |
+| 3   | Drift Guard              | Tab-switch / idle / skim detection, "Welcome back" card, Rewind                   |        |
+| 4   | Read Aloud               | Speech synthesis with word highlighting, click-to-start, speed                    |        |
+| 5   | Focus band & Chunk mode  | Line dimming band (mouse/keyboard), one-section-at-a-time view                    |        |
+| 6   | Settings                 | Options page, keyboard shortcuts, onboarding                                      |        |
+| 7   | Polish                   | Accessibility pass, ~20-site test corpus, performance                             |        |
+| 8   | Store submission         | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings |        |
+
+## Deferred to v1.1
+
+Focus sprints (timer), bionic bolding (experimental), local stats page, presets.
+
+## Out of scope for now
+
+AI features, PDFs, site blocking, mobile, accounts/sync.
+
+## Design principles
+
+1. **Drift first.** Every feature is judged by whether it helps the reader stay with, or return to, the text.
+2. **Calm, not naggy.** Nudges are gentle, rare and easy to turn off.
+3. **Private by default.** No network requests; local storage only.
+4. **Works without Focus View.** Focus band, Read Aloud and progress also work on the original page when an article can't be extracted.
