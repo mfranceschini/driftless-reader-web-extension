@@ -13,7 +13,9 @@ import { loadSettings, saveSettings, watchSettings } from '@/src/lib/settings-st
 import { pageKey } from '@/src/lib/page-key';
 import { ProgressBar } from './ProgressBar';
 import { AnchorButton, ResumeCard } from './AnchorControls';
-import { useReadingSession } from './useReadingSession';
+import { useReadingSession, type SessionObserver } from './useReadingSession';
+import { useDriftGuard } from './useDriftGuard';
+import { DriftCard } from './DriftCard';
 import { DisplayPanel } from './DisplayPanel';
 
 const FONT_STACKS: Record<ReaderSettings['fontFamily'], string> = {
@@ -67,23 +69,6 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     containerRef.current?.focus({ preventScroll: true });
   }, []);
 
-  // Esc closes the panel first, then the reader. Listen at the document level
-  // (capture) so it works even if focus was lost, e.g. after the panel closes.
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== 'Escape') return;
-      event.stopPropagation();
-      if (panelOpen) {
-        setPanelOpen(false);
-        displayButtonRef.current?.focus({ preventScroll: true });
-      } else {
-        onClose();
-      }
-    }
-    document.addEventListener('keydown', onKeyDown, true);
-    return () => document.removeEventListener('keydown', onKeyDown, true);
-  }, [panelOpen, onClose]);
-
   const style = {
     '--font': FONT_STACKS[settings.fontFamily],
     '--font-size': `${settings.fontSize}px`,
@@ -93,8 +78,37 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   } as CSSProperties;
 
   const [key] = useState(() => pageKey(location.href));
-  const session = useReadingSession(containerRef, contentRef, key, true);
+  const observerRef = useRef<SessionObserver | null>(null);
+  const session = useReadingSession(containerRef, contentRef, key, true, observerRef);
   const { state } = session;
+  const drift = useDriftGuard({
+    enabled: settings.driftGuard,
+    sensitivity: settings.driftSensitivity,
+    scrollRef: containerRef,
+    getRecap: session.getRecap,
+    suppressed: state.resumeOffer !== null,
+    observerRef,
+  });
+  const { card: driftCard, dismiss: dismissDrift } = drift;
+
+  // Esc closes a card or the panel first, then the reader. Listen at the document level
+  // (capture) so it works even if focus was lost, e.g. after the panel closes.
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      if (driftCard) {
+        dismissDrift();
+      } else if (panelOpen) {
+        setPanelOpen(false);
+        displayButtonRef.current?.focus({ preventScroll: true });
+      } else {
+        onClose();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
+  }, [panelOpen, onClose, driftCard, dismissDrift]);
   const timeLeft =
     state.wpm > 0
       ? formatTimeLeft(state.wordsRemaining, state.wpm)
@@ -157,7 +171,19 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
         <div ref={contentRef} className="content" />
       </article>
 
-      {!state.resumeOffer && state.anchorOffscreen && (
+      {driftCard && (
+        <DriftCard
+          card={driftCard}
+          onRewind={() => {
+            dismissDrift();
+            session.jumpToAnchor();
+          }}
+          onDismiss={dismissDrift}
+          onMuteSkimming={drift.muteSkimming}
+        />
+      )}
+
+      {!state.resumeOffer && !driftCard && state.anchorOffscreen && (
         <AnchorButton direction={state.anchorOffscreen} onClick={session.jumpToAnchor} />
       )}
     </div>

@@ -38,6 +38,31 @@ const INITIAL: ReadingSessionState = {
   resumeOffer: null,
 };
 
+/** Information about the block under the reading line, for Drift Guard. */
+export interface CurrentBlockInfo {
+  index: number;
+  /** Words before this block. */
+  position: number;
+  /** Blocks between the anchor and here (negative = before the anchor). */
+  beyondAnchor: number;
+  wpm: number;
+  /** Expected time to read this block at the learned speed. */
+  expectedMs: number;
+}
+
+export interface SessionObserver {
+  onCurrentBlock?(info: CurrentBlockInfo, now: number): void;
+}
+
+/** What to show in a "welcome back" recap. */
+export interface AnchorRecap {
+  anchor: number;
+  /** Full text of the anchor block. */
+  text: string;
+  /** Nearest heading at or before the anchor, if any. */
+  section: string | null;
+}
+
 interface Session {
   blocks: ReadingBlock[];
   tracker: AnchorTracker;
@@ -53,6 +78,7 @@ export function useReadingSession(
   contentRef: RefObject<HTMLElement | null>,
   pageKey: string,
   ready: boolean,
+  observerRef?: RefObject<SessionObserver | null>,
 ) {
   const [state, setState] = useState<ReadingSessionState>(INITIAL);
   const sessionRef = useRef<Session | null>(null);
@@ -94,6 +120,7 @@ export function useReadingSession(
     let interval = 0;
     let lastSave = 0;
     let saveTimer = 0;
+    let lastReported = -2;
 
     const blocks = indexBlocks(content);
     const stats = buildBlockStats(blocks.map((b) => b.words));
@@ -135,7 +162,24 @@ export function useReadingSession(
         const rect = session.blocks[current]!.el.getBoundingClientRect();
         fraction = rect.height > 0 ? (lineY - rect.top) / rect.height : 0;
       }
-      session.tracker.setCurrent(current, performance.now());
+      const now = performance.now();
+      session.tracker.setCurrent(current, now);
+      if (current !== lastReported && current >= 0) {
+        lastReported = current;
+        const snap = session.tracker.snapshot;
+        const words = session.stats.words[current] ?? 0;
+        observerRef?.current?.onCurrentBlock?.(
+          {
+            index: current,
+            position: session.stats.before[current] ?? 0,
+            // Before anything is read there's no anchor to drift from.
+            beyondAnchor: snap.anchor < 0 ? 0 : current - snap.anchor,
+            wpm: snap.wpm,
+            expectedMs: (words / Math.max(1, snap.wpm)) * 60_000,
+          },
+          now,
+        );
+      }
 
       const progress = atBottom
         ? { percent: 100, wordsRemaining: 0 }
@@ -206,7 +250,24 @@ export function useReadingSession(
       }
       sessionRef.current = null;
     };
-  }, [ready, pageKey, scrollRef, contentRef, markAnchor]);
+  }, [ready, pageKey, scrollRef, contentRef, markAnchor, observerRef]);
+
+  const getRecap = useCallback((): AnchorRecap | null => {
+    const session = sessionRef.current;
+    if (!session) return null;
+    const { anchor } = session.tracker.snapshot;
+    const block = session.blocks[anchor];
+    if (!block) return null;
+    let section: string | null = null;
+    for (let i = anchor; i >= 0; i -= 1) {
+      const el = session.blocks[i]!.el;
+      if (/^H[1-6]$/.test(el.tagName)) {
+        section = el.textContent?.trim() || null;
+        break;
+      }
+    }
+    return { anchor, text: block.el.textContent ?? '', section };
+  }, []);
 
   const jumpToAnchor = useCallback(() => {
     const anchor = sessionRef.current?.tracker.snapshot.anchor ?? -1;
@@ -231,5 +292,5 @@ export function useReadingSession(
     setState((prev) => ({ ...prev, resumeOffer: null }));
   }, []);
 
-  return { state, jumpToAnchor, acceptResume, startOver, dismissResume };
+  return { state, jumpToAnchor, acceptResume, startOver, dismissResume, getRecap };
 }

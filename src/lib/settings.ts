@@ -6,6 +6,7 @@
 export type Theme = 'auto' | 'light' | 'sepia' | 'dark';
 export type FontFamily = 'sans' | 'serif' | 'mono';
 export type LineWidth = 'narrow' | 'medium' | 'wide';
+export type DriftSensitivity = 'gentle' | 'balanced' | 'eager';
 
 export interface ReaderSettings {
   theme: Theme;
@@ -17,6 +18,9 @@ export interface ReaderSettings {
   lineWidth: LineWidth;
   /** Extra space between paragraphs, in em. */
   paragraphSpacing: number;
+  /** Drift Guard: welcome-back cards and skim nudges. */
+  driftGuard: boolean;
+  driftSensitivity: DriftSensitivity;
 }
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
@@ -26,6 +30,8 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   lineHeight: 1.7,
   lineWidth: 'medium',
   paragraphSpacing: 1.2,
+  driftGuard: true,
+  driftSensitivity: 'balanced',
 };
 
 export const LIMITS = {
@@ -44,6 +50,7 @@ export const LINE_WIDTH_CH: Record<LineWidth, number> = {
 const THEMES: readonly Theme[] = ['auto', 'light', 'sepia', 'dark'];
 const FONTS: readonly FontFamily[] = ['sans', 'serif', 'mono'];
 const WIDTHS: readonly LineWidth[] = ['narrow', 'medium', 'wide'];
+const SENSITIVITIES: readonly DriftSensitivity[] = ['gentle', 'balanced', 'eager'];
 
 function clamp(value: unknown, min: number, max: number, fallback: number): number {
   if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
@@ -74,6 +81,8 @@ export function normalizeSettings(raw: unknown): ReaderSettings {
       LIMITS.paragraphSpacing.max,
       d.paragraphSpacing,
     ),
+    driftGuard: typeof input.driftGuard === 'boolean' ? input.driftGuard : d.driftGuard,
+    driftSensitivity: oneOf(input.driftSensitivity, SENSITIVITIES, d.driftSensitivity),
   };
 }
 

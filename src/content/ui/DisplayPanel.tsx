@@ -1,4 +1,5 @@
 import {
+  type DriftSensitivity,
   LIMITS,
   stepSetting,
   type FontFamily,
@@ -23,6 +24,12 @@ const FONTS: { value: FontFamily; label: string }[] = [
   { value: 'sans', label: 'Sans' },
   { value: 'serif', label: 'Serif' },
   { value: 'mono', label: 'Mono' },
+];
+
+const SENSITIVITY: { value: DriftSensitivity; label: string }[] = [
+  { value: 'gentle', label: 'Gentle' },
+  { value: 'balanced', label: 'Balanced' },
+  { value: 'eager', label: 'Eager' },
 ];
 
 const WIDTHS: { value: LineWidth; label: string }[] = [
@@ -169,6 +176,29 @@ export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
         value={settings.lineWidth}
         onSelect={(v) => set('lineWidth', v)}
       />
+
+      <p className="panel-section">Drift Guard</p>
+      <div className="row">
+        <span className="row-label" id="driftless-drift-label">
+          Welcome-back &amp; skim nudges
+        </span>
+        <button
+          type="button"
+          role="switch"
+          className="switch"
+          aria-checked={settings.driftGuard}
+          aria-labelledby="driftless-drift-label"
+          onClick={() => set('driftGuard', !settings.driftGuard)}
+        />
+      </div>
+      {settings.driftGuard && (
+        <Segmented
+          label="Sensitivity"
+          options={SENSITIVITY}
+          value={settings.driftSensitivity}
+          onSelect={(v) => set('driftSensitivity', v)}
+        />
+      )}
     </div>
   );
 }
