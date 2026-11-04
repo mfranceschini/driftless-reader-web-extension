@@ -292,11 +292,14 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
         >
           ✕
         </button>
-        {panelOpen && (
-          <DisplayPanel settings={settings} onChange={updateSettings} lang={article.lang} />
-        )}
         <ProgressBar percent={state.percent} />
       </div>
+
+      {/* Outside the top bar on purpose: a backdrop-filter on an ancestor
+          would stop the panel's glass from blurring the article behind it. */}
+      {panelOpen && (
+        <DisplayPanel settings={settings} onChange={updateSettings} lang={article.lang} />
+      )}
 
       {state.resumeOffer && (
         <ResumeCard

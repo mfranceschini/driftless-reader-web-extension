@@ -42,6 +42,8 @@ export interface ReaderSettings {
   focusBandMode: FocusBandMode;
   /** Chunk mode: one small piece of the article at a time. */
   chunkMode: boolean;
+  /** Frosted-glass look on floating controls (never on the text). */
+  glass: boolean;
 }
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
@@ -62,6 +64,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   focusBandLines: 3,
   focusBandMode: 'line',
   chunkMode: false,
+  glass: true,
 };
 
 export const LIMITS = {
@@ -159,6 +162,7 @@ export function normalizeSettings(raw: unknown): ReaderSettings {
       : d.focusBandLines,
     focusBandMode: oneOf(input.focusBandMode, BAND_MODES, d.focusBandMode),
     chunkMode: typeof input.chunkMode === 'boolean' ? input.chunkMode : d.chunkMode,
+    glass: typeof input.glass === 'boolean' ? input.glass : d.glass,
   };
 }
 

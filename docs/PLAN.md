@@ -2,18 +2,19 @@
 
 Each phase ends with a build the test user loads unpacked in Edge and uses on real articles.
 
-| #   | Phase                           | Deliverable                                                                                                                              | Status |
-| --- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| 0   | Setup                           | WXT + React + TS scaffold, on-demand injection, Shadow DOM shell, CI, license                                                            | ✅     |
-| 1   | Focus View                      | Readability extraction, sanitized reader layout, typography & themes, display panel                                                      | ✅     |
-| 2   | Anchor marker & progress        | Dwell-based anchor marker, progress bar, learned time left, per-page resume                                                              | ✅     |
-| 3   | Drift Guard                     | Away / idle / skim detection, welcome-back recap card, rewind, sensitivity presets                                                       | ✅     |
-| 3.5 | Typography (from reading guide) | Bundled Lexend (default) & Atkinson Hyperlegible Next, Arial, Serif; 18px / 1.6 / 68ch defaults; letter & word spacing; WCAG 1.4.12 test | ✅     |
-| 4   | Read Aloud                      | Sentence-by-sentence speech, sentence + word highlights (CSS Highlight API), auto-follow, click-to-jump, speed & voice                   | ✅     |
-| 5   | Focus band & Chunk mode         | Focus band (1/3/5 lines, reading-line or mouse; also on non-article pages), Chunk mode (Space / Shift+Space)                             | ✅     |
-| 6   | Settings                        | Options page, keyboard shortcuts, onboarding                                                                                             | ⏳     |
-| 7   | Polish                          | Accessibility pass, ~20-site test corpus, performance                                                                                    |        |
-| 8   | Store submission                | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings                                                        |        |
+| #   | Phase                           | Deliverable                                                                                                                                                 | Status |
+| --- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 0   | Setup                           | WXT + React + TS scaffold, on-demand injection, Shadow DOM shell, CI, license                                                                               | ✅     |
+| 1   | Focus View                      | Readability extraction, sanitized reader layout, typography & themes, display panel                                                                         | ✅     |
+| 2   | Anchor marker & progress        | Dwell-based anchor marker, progress bar, learned time left, per-page resume                                                                                 | ✅     |
+| 3   | Drift Guard                     | Away / idle / skim detection, welcome-back recap card, rewind, sensitivity presets                                                                          | ✅     |
+| 3.5 | Typography (from reading guide) | Bundled Lexend (default) & Atkinson Hyperlegible Next, Arial, Serif; 18px / 1.6 / 68ch defaults; letter & word spacing; WCAG 1.4.12 test                    | ✅     |
+| 4   | Read Aloud                      | Sentence-by-sentence speech, sentence + word highlights (CSS Highlight API), auto-follow, click-to-jump, speed & voice                                      | ✅     |
+| 5   | Focus band & Chunk mode         | Focus band (1/3/5 lines, reading-line or mouse; also on non-article pages), Chunk mode (Space / Shift+Space)                                                | ✅     |
+| 5.5 | Glass effects                   | Frosted glass on floating controls only (on by default, toggle), solid fallback for reduce-transparency / forced colors, automated worst-case contrast test | ✅     |
+| 6   | Settings                        | Options page, keyboard shortcuts, onboarding                                                                                                                | ⏳     |
+| 7   | Polish                          | Accessibility pass, ~20-site test corpus, performance                                                                                                       |        |
+| 8   | Store submission                | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings                                                                           |        |
 
 ## Deferred to v1.1
 

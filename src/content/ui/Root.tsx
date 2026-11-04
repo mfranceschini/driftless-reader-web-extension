@@ -3,6 +3,8 @@ import { extractArticle, type Article } from '@/src/content/extract';
 import { NoArticlePill } from './NoArticlePill';
 import { ReaderApp } from './ReaderApp';
 import { PageFocusBand } from './PageFocusBand';
+import { DEFAULT_SETTINGS } from '@/src/lib/settings';
+import { loadSettings, watchSettings } from '@/src/lib/settings-store';
 
 export interface RootProps {
   initialArticle: Article | null;
@@ -24,7 +26,31 @@ function usePageScrollLock(locked: boolean) {
   }, [locked]);
 }
 
-export function Root({ initialArticle, onClose }: RootProps) {
+/** Tracks the "Glass effects" setting so every surface (reader or pill) can use it. */
+function useGlassSetting(): boolean {
+  const [glass, setGlass] = useState(DEFAULT_SETTINGS.glass);
+  useEffect(() => {
+    let active = true;
+    void loadSettings().then((s) => active && setGlass(s.glass));
+    const unwatch = watchSettings((s) => setGlass(s.glass));
+    return () => {
+      active = false;
+      unwatch();
+    };
+  }, []);
+  return glass;
+}
+
+export function Root(props: RootProps) {
+  const glass = useGlassSetting();
+  return (
+    <div className={glass ? 'glass-on' : undefined} style={{ display: 'contents' }}>
+      <RootContent {...props} />
+    </div>
+  );
+}
+
+function RootContent({ initialArticle, onClose }: RootProps) {
   const [article, setArticle] = useState<Article | null>(initialArticle);
   const [failed, setFailed] = useState(false);
   const [pageBand, setPageBand] = useState(false);

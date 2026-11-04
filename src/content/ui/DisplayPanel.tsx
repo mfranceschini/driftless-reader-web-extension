@@ -181,6 +181,20 @@ export function DisplayPanel({ settings, onChange, lang }: DisplayPanelProps) {
         </span>
       </div>
 
+      <div className="row">
+        <span className="row-label" id="driftless-glass-label">
+          Glass effects
+        </span>
+        <button
+          type="button"
+          role="switch"
+          className="switch"
+          aria-checked={settings.glass}
+          aria-labelledby="driftless-glass-label"
+          onClick={() => set('glass', !settings.glass)}
+        />
+      </div>
+
       <Segmented
         label="Font"
         options={FONTS}
