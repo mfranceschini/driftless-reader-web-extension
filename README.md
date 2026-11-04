@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets-src/logo.png" alt="Driftless Reader logo" width="200" />
+</p>
+
 # Driftless Reader
 
 An open-source **Microsoft Edge and Chrome extension** that helps people with ADHD stay with an article from start to finish.

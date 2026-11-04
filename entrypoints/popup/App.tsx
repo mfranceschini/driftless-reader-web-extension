@@ -29,7 +29,8 @@ export function App() {
 
   return (
     <main className="popup">
-      <header>
+      <header className="brand">
+        <img src="/icon/48.png" alt="" width="40" height="40" />
         <h1>Driftless Reader</h1>
         <p className="tagline">Stay with the text.</p>
       </header>
