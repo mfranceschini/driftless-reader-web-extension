@@ -1,4 +1,5 @@
 import { isProbablyReaderable } from '@mozilla/readability';
+import { extractArticle } from '@/src/content/extract';
 import { mountReaderShell, type ReaderShell } from '@/src/content/shell';
 
 declare global {
@@ -19,12 +20,10 @@ export default defineContentScript({
     const existing = window.__driftlessReader;
     if (existing) {
       existing.destroy();
-      window.__driftlessReader = undefined;
       return;
     }
 
-    window.__driftlessReader = mountReaderShell({
-      isArticle: isProbablyReaderable(document),
-    });
+    const article = isProbablyReaderable(document) ? extractArticle(document) : null;
+    window.__driftlessReader = mountReaderShell(article);
   },
 });

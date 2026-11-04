@@ -31,6 +31,7 @@ pnpm install
 pnpm dev          # opens Edge with the extension loaded (hot reload)
 pnpm dev:chrome   # same, in Chrome
 pnpm check        # typecheck + lint + format check + unit tests
+pnpm test:e2e     # end-to-end tests in Chromium with the extension loaded
 pnpm zip          # store-ready zips for Edge and Chrome in .output/
 ```
 
