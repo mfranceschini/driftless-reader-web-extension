@@ -2,17 +2,17 @@
 
 Each phase ends with a build the test user loads unpacked in Edge and uses on real articles.
 
-| #   | Phase                    | Deliverable                                                                       | Status |
-| --- | ------------------------ | --------------------------------------------------------------------------------- | ------ |
-| 0   | Setup                    | WXT + React + TS scaffold, on-demand injection, Shadow DOM shell, CI, license     | ✅     |
-| 1   | Focus View               | Readability extraction, reader layout, typography & themes, popup controls        | ⏳     |
-| 2   | Anchor marker & progress | Last-read paragraph marker (saved per page), progress bar, time left              |        |
-| 3   | Drift Guard              | Tab-switch / idle / skim detection, "Welcome back" card, Rewind                   |        |
-| 4   | Read Aloud               | Speech synthesis with word highlighting, click-to-start, speed                    |        |
-| 5   | Focus band & Chunk mode  | Line dimming band (mouse/keyboard), one-section-at-a-time view                    |        |
-| 6   | Settings                 | Options page, keyboard shortcuts, onboarding                                      |        |
-| 7   | Polish                   | Accessibility pass, ~20-site test corpus, performance                             |        |
-| 8   | Store submission         | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings |        |
+| #   | Phase                    | Deliverable                                                                         | Status |
+| --- | ------------------------ | ----------------------------------------------------------------------------------- | ------ |
+| 0   | Setup                    | WXT + React + TS scaffold, on-demand injection, Shadow DOM shell, CI, license       | ✅     |
+| 1   | Focus View               | Readability extraction, sanitized reader layout, typography & themes, display panel | ✅     |
+| 2   | Anchor marker & progress | Dwell-based anchor marker, progress bar, learned time left, per-page resume         | ✅     |
+| 3   | Drift Guard              | Tab-switch / idle / skim detection, "Welcome back" card, Rewind                     | ⏳     |
+| 4   | Read Aloud               | Speech synthesis with word highlighting, click-to-start, speed                      |        |
+| 5   | Focus band & Chunk mode  | Line dimming band (mouse/keyboard), one-section-at-a-time view                      |        |
+| 6   | Settings                 | Options page, keyboard shortcuts, onboarding                                        |        |
+| 7   | Polish                   | Accessibility pass, ~20-site test corpus, performance                               |        |
+| 8   | Store submission         | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings   |        |
 
 ## Deferred to v1.1
 
