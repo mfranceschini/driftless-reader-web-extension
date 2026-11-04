@@ -23,6 +23,9 @@ import { useDriftGuard } from './useDriftGuard';
 import { DriftCard } from './DriftCard';
 import { Player } from './Player';
 import { useReadAloud } from './useReadAloud';
+import { useChunkMode } from './useChunkMode';
+import { FocusBand } from './FocusBand';
+import { ChunkNav } from './ChunkNav';
 import { DisplayPanel } from './DisplayPanel';
 import { ensureFont, FONT_STACKS } from '../fonts';
 
@@ -96,9 +99,47 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     scrollRef: containerRef,
     getRecap: session.getRecap,
     suppressed: state.resumeOffer !== null,
-    observerRef,
   });
   const { card: driftCard, dismiss: dismissDrift, setPassive } = drift;
+
+  const chunks = useChunkMode({
+    enabled: settings.chunkMode,
+    contentRef,
+    getBlocks: session.getBlocks,
+    scrollToBlockAt: session.scrollToBlockAt,
+  });
+
+  // One observer feeds every feature that cares about the current block.
+  const onDriftBlock = drift.onCurrentBlock;
+  const onChunkBlock = chunks.onCurrentBlock;
+  useEffect(() => {
+    observerRef.current = {
+      onCurrentBlock(info, now) {
+        onDriftBlock(info, now);
+        onChunkBlock(info.index);
+      },
+    };
+  }, [onDriftBlock, onChunkBlock]);
+
+  const refocusArticle = () => containerRef.current?.focus({ preventScroll: true });
+
+  // Focus band (reading-line mode): arrow keys move the text exactly one line.
+  const lineHeightPx = settings.fontSize * settings.lineHeight;
+  useEffect(() => {
+    if (!settings.focusBand || settings.focusBandMode !== 'line') return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.composedPath()[0];
+      if (target instanceof Element && target.closest('select, input, textarea')) return;
+      event.preventDefault();
+      containerRef.current?.scrollBy({
+        top: event.key === 'ArrowDown' ? lineHeightPx : -lineHeightPx,
+      });
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => document.removeEventListener('keydown', onKey, true);
+  }, [settings.focusBand, settings.focusBandMode, lineHeightPx]);
 
   const readAloud = useReadAloud({
     scrollRef: containerRef,
@@ -146,7 +187,7 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   return (
     <div
       ref={containerRef}
-      className={`reader theme-${settings.theme}${playerOpen ? ' with-player' : ''}`}
+      className={`reader theme-${settings.theme}${playerOpen ? ' with-player' : ''}${settings.chunkMode ? ' chunk-mode' : ''}`}
       style={style}
       role="dialog"
       aria-modal="true"
@@ -157,6 +198,56 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
         <span className="meta" aria-live="off">
           {meta}
         </span>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Focus band"
+          aria-pressed={settings.focusBand}
+          title="Focus band: dim all but a few lines"
+          onClick={() => {
+            updateSettings({ ...settings, focusBand: !settings.focusBand });
+            refocusArticle(); // so arrow keys move the text, not this button
+          }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M4 5h16M4 19h16" opacity="0.35" />
+            <rect x="2.5" y="9" width="19" height="6" rx="2" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label="Chunk mode"
+          aria-pressed={settings.chunkMode}
+          title="Chunk mode: one piece at a time (Space for next)"
+          onClick={() => {
+            updateSettings({ ...settings, chunkMode: !settings.chunkMode });
+            refocusArticle(); // so Space goes to the next chunk instead of re-pressing this button
+          }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <rect x="3.5" y="3.5" width="17" height="7" rx="2" />
+            <path d="M5 15h14M5 19h10" opacity="0.35" />
+          </svg>
+        </button>
         <button
           type="button"
           className="icon-btn"
@@ -258,6 +349,23 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
           onSlower={() => updateSettings(stepSetting(settings, 'readAloudRate', -1))}
           onFaster={() => updateSettings(stepSetting(settings, 'readAloudRate', 1))}
           onClose={readAloud.stop}
+        />
+      )}
+      {settings.focusBand && (
+        <FocusBand
+          mode={settings.focusBandMode}
+          lines={settings.focusBandLines}
+          lineHeightAt={() => lineHeightPx}
+          scrollRef={containerRef}
+        />
+      )}
+
+      {settings.chunkMode && (
+        <ChunkNav
+          index={chunks.chunk.index}
+          total={chunks.chunk.total}
+          onPrev={chunks.prev}
+          onNext={chunks.next}
         />
       )}
     </div>

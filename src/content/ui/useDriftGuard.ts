@@ -14,8 +14,6 @@ interface UseDriftGuardOptions {
   getRecap(): AnchorRecap | null;
   /** True while another card (e.g. resume) is showing. */
   suppressed: boolean;
-  /** Filled in here; useReadingSession calls it when the current block changes. */
-  observerRef: RefObject<SessionObserver | null>;
 }
 
 const ACTIVITY_EVENTS = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'] as const;
@@ -38,7 +36,6 @@ export function useDriftGuard({
   scrollRef,
   getRecap,
   suppressed,
-  observerRef,
 }: UseDriftGuardOptions) {
   const [card, setCard] = useState<DriftCardState | null>(null);
   const detectorRef = useRef<DriftDetector | null>(null);
@@ -75,13 +72,6 @@ export function useDriftGuard({
     detectorRef.current = detector;
     if (!isPresent()) detector.setPresent(false, performance.now());
 
-    observerRef.current = {
-      onCurrentBlock(info, now) {
-        detector.setCurrentBlockExpectedMs(info.expectedMs);
-        detector.scrolledTo(info.index, info.position, info.beyondAnchor, info.wpm, now);
-      },
-    };
-
     // Presence comes from events (more reliable than polling hasFocus()):
     // leaving = tab hidden or window blurred; returning = visible and focused.
     const onPresence = () => detector.setPresent(isPresent(), performance.now());
@@ -115,11 +105,10 @@ export function useDriftGuard({
       scroller?.removeEventListener('scroll', onActivity);
       window.clearInterval(interval);
       detectorRef.current = null;
-      observerRef.current = null;
     };
     // sensitivity changes are applied by the effect above without resetting state
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, scrollRef, observerRef]);
+  }, [enabled, scrollRef]);
 
   // Scrolling well away from where a welcome-back card appeared means you've
   // moved on. (Skim nudges stay until answered: you are scrolling by definition.)
@@ -145,5 +134,16 @@ export function useDriftGuard({
     detectorRef.current?.setPassive(passive, performance.now());
   }, []);
 
-  return { card: enabled ? card : null, dismiss, muteSkimming, setPassive };
+  /** Feed from useReadingSession whenever the block under the reading line changes. */
+  const onCurrentBlock = useCallback<NonNullable<SessionObserver['onCurrentBlock']>>(
+    (info, now) => {
+      const detector = detectorRef.current;
+      if (!detector) return;
+      detector.setCurrentBlockExpectedMs(info.expectedMs);
+      detector.scrolledTo(info.index, info.position, info.beyondAnchor, info.wpm, now);
+    },
+    [],
+  );
+
+  return { card: enabled ? card : null, dismiss, muteSkimming, setPassive, onCurrentBlock };
 }

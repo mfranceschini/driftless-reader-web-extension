@@ -7,6 +7,9 @@ export type Theme = 'auto' | 'light' | 'sepia' | 'dark';
 export type FontFamily = 'lexend' | 'atkinson' | 'arial' | 'serif';
 export type LineWidth = 'narrow' | 'medium' | 'wide';
 export type DriftSensitivity = 'gentle' | 'balanced' | 'eager';
+export type FocusBandLines = 1 | 3 | 5;
+/** 'line': band stays on the reading line and text scrolls through it; 'pointer': follows the mouse. */
+export type FocusBandMode = 'line' | 'pointer';
 
 /** Bump when defaults change in a way existing users should receive. */
 export const SETTINGS_VERSION = 2;
@@ -33,6 +36,12 @@ export interface ReaderSettings {
   readAloudRate: number;
   /** Chosen voice's voiceURI, or null for "best match for the article". */
   readAloudVoice: string | null;
+  /** Focus band: dims everything except a few lines. */
+  focusBand: boolean;
+  focusBandLines: FocusBandLines;
+  focusBandMode: FocusBandMode;
+  /** Chunk mode: one small piece of the article at a time. */
+  chunkMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
@@ -49,6 +58,10 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   driftSensitivity: 'balanced',
   readAloudRate: 1,
   readAloudVoice: null,
+  focusBand: false,
+  focusBandLines: 3,
+  focusBandMode: 'line',
+  chunkMode: false,
 };
 
 export const LIMITS = {
@@ -72,6 +85,8 @@ const THEMES: readonly Theme[] = ['auto', 'light', 'sepia', 'dark'];
 const FONTS: readonly FontFamily[] = ['lexend', 'atkinson', 'arial', 'serif'];
 const WIDTHS: readonly LineWidth[] = ['narrow', 'medium', 'wide'];
 const SENSITIVITIES: readonly DriftSensitivity[] = ['gentle', 'balanced', 'eager'];
+const BAND_LINES: readonly FocusBandLines[] = [1, 3, 5];
+const BAND_MODES: readonly FocusBandMode[] = ['line', 'pointer'];
 
 function clamp(value: unknown, min: number, max: number, fallback: number): number {
   if (typeof value !== 'number' || Number.isNaN(value)) return fallback;
@@ -138,6 +153,12 @@ export function normalizeSettings(raw: unknown): ReaderSettings {
       typeof input.readAloudVoice === 'string' && input.readAloudVoice.length < 500
         ? input.readAloudVoice
         : null,
+    focusBand: typeof input.focusBand === 'boolean' ? input.focusBand : d.focusBand,
+    focusBandLines: BAND_LINES.includes(input.focusBandLines as FocusBandLines)
+      ? (input.focusBandLines as FocusBandLines)
+      : d.focusBandLines,
+    focusBandMode: oneOf(input.focusBandMode, BAND_MODES, d.focusBandMode),
+    chunkMode: typeof input.chunkMode === 'boolean' ? input.chunkMode : d.chunkMode,
   };
 }
 

@@ -9,8 +9,8 @@
   --fg: #1f2328;
   --muted: #5f6b76;
   --rule: #e3e5e8;
-  --link: #0b6e6e;
-  --accent: #0f766e;
+  --link: #5b21b6;
+  --accent: #6d28d9;
   --accent-fg: #ffffff;
   --panel: #ffffff;
   --shadow: 0 8px 28px rgb(15 23 42 / 0.14);
@@ -22,8 +22,8 @@
   --fg: #3b2f22;
   --muted: #76664f;
   --rule: #e4d8bf;
-  --link: #8a4b10;
-  --accent: #8a4b10;
+  --link: #6b2fb3;
+  --accent: #6d28d9;
   --accent-fg: #fffaf0;
   --panel: #fbf6ea;
   --shadow: 0 8px 28px rgb(59 47 34 / 0.18);
@@ -35,9 +35,9 @@
   --fg: #dfe3e8;
   --muted: #98a2ad;
   --rule: #2b3138;
-  --link: #5eead4;
-  --accent: #2dd4bf;
-  --accent-fg: #042f2e;
+  --link: #c4b5fd;
+  --accent: #a78bfa;
+  --accent-fg: #1e1035;
   --panel: #1d2127;
   --shadow: 0 8px 28px rgb(0 0 0 / 0.5);
   --chip: #262c33;
@@ -49,9 +49,9 @@
     --fg: #dfe3e8;
     --muted: #98a2ad;
     --rule: #2b3138;
-    --link: #5eead4;
-    --accent: #2dd4bf;
-    --accent-fg: #042f2e;
+    --link: #c4b5fd;
+    --accent: #a78bfa;
+    --accent-fg: #1e1035;
     --panel: #1d2127;
     --shadow: 0 8px 28px rgb(0 0 0 / 0.5);
     --chip: #262c33;
@@ -390,8 +390,8 @@
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 999px;
-  background: #2dd4bf;
-  color: #042f2e;
+  background: #a78bfa;
+  color: #1e1035;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -739,21 +739,21 @@
 /* ---------- Read Aloud ---------- */
 .theme-light,
 .theme-auto {
-  --hl-sentence: rgb(15 118 110 / 0.1);
-  --hl-word: rgb(15 118 110 / 0.28);
+  --hl-sentence: rgb(109 40 217 / 0.09);
+  --hl-word: rgb(109 40 217 / 0.24);
 }
 .theme-sepia {
-  --hl-sentence: rgb(138 75 16 / 0.1);
-  --hl-word: rgb(138 75 16 / 0.26);
+  --hl-sentence: rgb(109 40 217 / 0.09);
+  --hl-word: rgb(109 40 217 / 0.22);
 }
 .theme-dark {
-  --hl-sentence: rgb(45 212 191 / 0.12);
-  --hl-word: rgb(45 212 191 / 0.32);
+  --hl-sentence: rgb(167 139 250 / 0.14);
+  --hl-word: rgb(167 139 250 / 0.36);
 }
 @media (prefers-color-scheme: dark) {
   .theme-auto {
-    --hl-sentence: rgb(45 212 191 / 0.12);
-    --hl-word: rgb(45 212 191 / 0.32);
+    --hl-sentence: rgb(167 139 250 / 0.14);
+    --hl-word: rgb(167 139 250 / 0.36);
   }
 }
 
@@ -850,5 +850,125 @@
 
 .select:focus-visible {
   outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Focus band ---------- */
+.focus-band {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* below the top bar, cards and player; above the article */
+  pointer-events: none;
+}
+
+.focus-band-dim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+}
+
+.focus-band-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-block: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .focus-band-dim,
+  .focus-band-edge {
+    transition:
+      top 90ms linear,
+      height 90ms linear;
+  }
+}
+
+/* On pages without an article: a neutral dim that works on any site,
+   stacked above the site's own sticky headers. */
+.focus-band.page-band {
+  z-index: 2147483645;
+}
+
+.page-band .focus-band-dim {
+  background: rgb(12 6 32 / 0.58);
+}
+
+.page-band .focus-band-edge {
+  border-block: 2px solid rgb(167 139 250 / 0.9);
+}
+
+/* ---------- Chunk mode ---------- */
+.content .dl-dim {
+  opacity: 0.14;
+  transition: opacity 220ms ease-out;
+}
+
+.chunk-nav {
+  position: fixed;
+  right: 16px;
+  bottom: 20px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+}
+
+.chunk-pos {
+  font:
+    600 13px/1.2 system-ui,
+    'Segoe UI',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  padding: 2px 0;
+}
+
+.icon-btn[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent);
+}
+
+.try-btn.secondary {
+  background: rgb(255 255 255 / 0.14);
+  color: #f8fafc;
+}
+
+.page-band-bar {
+  gap: 12px;
+}
+
+.pill-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.pill-seg button {
+  all: unset;
+  cursor: pointer;
+  min-width: 26px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  color: #cbd5e1;
+}
+
+.pill-seg button[aria-pressed='true'] {
+  background: #a78bfa;
+  color: #1e1035;
+}
+
+.pill-seg button:focus-visible {
+  outline: 2px solid #a78bfa;
   outline-offset: 2px;
 }

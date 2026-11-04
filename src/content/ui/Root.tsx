@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { extractArticle, type Article } from '@/src/content/extract';
 import { NoArticlePill } from './NoArticlePill';
 import { ReaderApp } from './ReaderApp';
+import { PageFocusBand } from './PageFocusBand';
 
 export interface RootProps {
   initialArticle: Article | null;
@@ -26,9 +27,12 @@ function usePageScrollLock(locked: boolean) {
 export function Root({ initialArticle, onClose }: RootProps) {
   const [article, setArticle] = useState<Article | null>(initialArticle);
   const [failed, setFailed] = useState(false);
+  const [pageBand, setPageBand] = useState(false);
   usePageScrollLock(article !== null);
 
   if (article) return <ReaderApp article={article} onClose={onClose} />;
+
+  if (pageBand) return <PageFocusBand onClose={onClose} />;
 
   if (failed) {
     return (
@@ -45,6 +49,7 @@ export function Root({ initialArticle, onClose }: RootProps) {
   return (
     <NoArticlePill
       onClose={onClose}
+      onFocusBand={() => setPageBand(true)}
       onTryAnyway={() => {
         const forced = extractArticle(document);
         if (forced) setArticle(forced);

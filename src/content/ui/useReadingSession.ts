@@ -252,6 +252,22 @@ export function useReadingSession(
     };
   }, [ready, pageKey, scrollRef, contentRef, markAnchor, observerRef]);
 
+  const scrollToBlockAt = useCallback(
+    (index: number, line: number) => {
+      const scroller = scrollRef.current;
+      const block = sessionRef.current?.blocks[index];
+      if (!scroller || !block) return;
+      const top =
+        block.el.getBoundingClientRect().top -
+        scroller.getBoundingClientRect().top +
+        scroller.scrollTop -
+        scroller.clientHeight * line;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      scroller.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
+    },
+    [scrollRef],
+  );
+
   const getRecap = useCallback((): AnchorRecap | null => {
     const session = sessionRef.current;
     if (!session) return null;
@@ -304,5 +320,6 @@ export function useReadingSession(
     getRecap,
     getBlocks,
     getCurrentBlock,
+    scrollToBlockAt,
   };
 }

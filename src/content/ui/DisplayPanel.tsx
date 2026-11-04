@@ -3,6 +3,7 @@ import { ensureFont, FONT_STACKS } from '../fonts';
 import { getVoices, sortVoicesForLang } from '../speech/voices';
 import {
   type DriftSensitivity,
+  type FocusBandMode,
   LIMITS,
   stepSetting,
   type FontFamily,
@@ -36,6 +37,17 @@ const SENSITIVITY: { value: DriftSensitivity; label: string }[] = [
   { value: 'gentle', label: 'Gentle' },
   { value: 'balanced', label: 'Balanced' },
   { value: 'eager', label: 'Eager' },
+];
+
+const BAND_LINES: { value: '1' | '3' | '5'; label: string }[] = [
+  { value: '1', label: '1 line' },
+  { value: '3', label: '3' },
+  { value: '5', label: '5' },
+];
+
+const BAND_MODES: { value: FocusBandMode; label: string }[] = [
+  { value: 'line', label: 'Reading line' },
+  { value: 'pointer', label: 'Mouse' },
 ];
 
 const WIDTHS: { value: LineWidth; label: string }[] = [
@@ -202,6 +214,22 @@ export function DisplayPanel({ settings, onChange, lang }: DisplayPanelProps) {
           {stepper('wordSpacing', 'Word spacing', (n) => (n === 0 ? '0' : `+${n.toFixed(2)}`))}
         </>
       )}
+
+      <p className="panel-section">Focus tools</p>
+      <Segmented
+        label="Band height"
+        options={BAND_LINES}
+        value={String(settings.focusBandLines) as '1' | '3' | '5'}
+        onSelect={(v) =>
+          onChange({ ...settings, focusBand: true, focusBandLines: Number(v) as 1 | 3 | 5 })
+        }
+      />
+      <Segmented
+        label="Band follows"
+        options={BAND_MODES}
+        value={settings.focusBandMode}
+        onSelect={(v) => onChange({ ...settings, focusBand: true, focusBandMode: v })}
+      />
 
       <p className="panel-section">Read Aloud</p>
       {stepper('readAloudRate', 'Speed', (n) => `${n.toFixed(1)}×`)}
