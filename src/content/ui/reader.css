@@ -425,3 +425,173 @@
   cursor: default;
   background: none;
 }
+
+/* ---------- Progress bar ---------- */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .progress-fill {
+    transition: transform 200ms ease-out;
+  }
+}
+
+/* ---------- Anchor marker ---------- */
+.theme-light,
+.theme-auto,
+.theme-sepia {
+  --anchor: #d97706;
+  --anchor-soft: rgb(245 158 11 / 0.16);
+}
+
+.theme-dark {
+  --anchor: #fbbf24;
+  --anchor-soft: rgb(251 191 36 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-auto {
+    --anchor: #fbbf24;
+    --anchor-soft: rgb(251 191 36 / 0.14);
+  }
+}
+
+.content .dl-anchor {
+  position: relative;
+}
+
+.content .dl-anchor::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: 0.25em;
+  bottom: 0.25em;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--anchor);
+}
+
+.content .dl-flash {
+  border-radius: 6px;
+  animation: dl-flash 1.6s ease-out;
+}
+
+@keyframes dl-flash {
+  0%,
+  30% {
+    background: var(--anchor-soft);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* ---------- Floating cards & buttons ---------- */
+.card {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: min(420px, calc(100vw - 32px));
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+  font:
+    15px/1.4 system-ui,
+    'Segoe UI',
+    sans-serif;
+}
+
+.card-title {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.card-body {
+  margin: 0 0 14px;
+  color: var(--muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.card-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.btn {
+  all: unset;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.btn:focus-visible,
+.anchor-btn:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.anchor-btn {
+  all: unset;
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+  font:
+    600 14px/1 system-ui,
+    'Segoe UI',
+    sans-serif;
+}
+
+.anchor-btn:hover {
+  background: var(--chip);
+}
+
+.anchor-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--anchor);
+}

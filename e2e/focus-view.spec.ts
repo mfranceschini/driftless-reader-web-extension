@@ -16,7 +16,7 @@ test.describe('Focus View', () => {
     await expect(reader.locator('.content')).toContainText('Why drifting happens');
     await expect(reader.locator('.content')).not.toContainText('Subscribe now');
     await expect(reader.locator('.content')).not.toContainText('advertisement');
-    await expect(reader.locator('.meta')).toContainText('min read');
+    await expect(reader.locator('.meta')).toContainText('min left');
 
     // Page behind is locked while reading
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe(

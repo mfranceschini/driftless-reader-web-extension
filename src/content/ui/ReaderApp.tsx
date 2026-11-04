@@ -10,6 +10,10 @@ import type { Article } from '@/src/content/extract';
 import { formatTimeLeft } from '@/src/lib/reading-time';
 import { DEFAULT_SETTINGS, LINE_WIDTH_CH, type ReaderSettings } from '@/src/lib/settings';
 import { loadSettings, saveSettings, watchSettings } from '@/src/lib/settings-store';
+import { pageKey } from '@/src/lib/page-key';
+import { ProgressBar } from './ProgressBar';
+import { AnchorButton, ResumeCard } from './AnchorControls';
+import { useReadingSession } from './useReadingSession';
 import { DisplayPanel } from './DisplayPanel';
 
 const FONT_STACKS: Record<ReaderSettings['fontFamily'], string> = {
@@ -88,7 +92,14 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     '--para-space': `${settings.paragraphSpacing}em`,
   } as CSSProperties;
 
-  const meta = [article.siteName, formatTimeLeft(article.wordCount).replace('left', 'read')]
+  const [key] = useState(() => pageKey(location.href));
+  const session = useReadingSession(containerRef, contentRef, key, true);
+  const { state } = session;
+  const timeLeft =
+    state.wpm > 0
+      ? formatTimeLeft(state.wordsRemaining, state.wpm)
+      : formatTimeLeft(article.wordCount).replace('left', 'read');
+  const meta = [article.siteName, state.wpm > 0 ? `${state.percent}%` : null, timeLeft]
     .filter(Boolean)
     .join(' · ');
 
@@ -103,7 +114,9 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
       tabIndex={-1}
     >
       <div className="topbar">
-        <span className="meta">{meta}</span>
+        <span className="meta" aria-live="off">
+          {meta}
+        </span>
         <button
           ref={displayButtonRef}
           type="button"
@@ -126,13 +139,27 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
           ✕
         </button>
         {panelOpen && <DisplayPanel settings={settings} onChange={updateSettings} />}
+        <ProgressBar percent={state.percent} />
       </div>
+
+      {state.resumeOffer && (
+        <ResumeCard
+          percent={state.resumeOffer.percent}
+          onContinue={session.acceptResume}
+          onStartOver={session.startOver}
+          onDismiss={session.dismissResume}
+        />
+      )}
 
       <article className="page" lang={article.lang ?? undefined} dir={article.dir ?? undefined}>
         <h1 className="title">{article.title}</h1>
         {article.byline && <p className="byline">{article.byline}</p>}
         <div ref={contentRef} className="content" />
       </article>
+
+      {!state.resumeOffer && state.anchorOffscreen && (
+        <AnchorButton direction={state.anchorOffscreen} onClick={session.jumpToAnchor} />
+      )}
     </div>
   );
 }
