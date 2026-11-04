@@ -29,6 +29,10 @@ export interface ReaderSettings {
   /** Drift Guard: welcome-back cards and skim nudges. */
   driftGuard: boolean;
   driftSensitivity: DriftSensitivity;
+  /** Read Aloud speed (1 = normal). */
+  readAloudRate: number;
+  /** Chosen voice's voiceURI, or null for "best match for the article". */
+  readAloudVoice: string | null;
 }
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
@@ -43,6 +47,8 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   wordSpacing: 0,
   driftGuard: true,
   driftSensitivity: 'balanced',
+  readAloudRate: 1,
+  readAloudVoice: null,
 };
 
 export const LIMITS = {
@@ -52,6 +58,7 @@ export const LIMITS = {
   // Upper bounds go beyond WCAG 2.2 SC 1.4.12 (0.12em letters, 0.16em words).
   letterSpacing: { min: 0, max: 0.15, step: 0.03 },
   wordSpacing: { min: 0, max: 0.4, step: 0.08 },
+  readAloudRate: { min: 0.6, max: 2, step: 0.1 },
 } as const;
 
 /** Max characters per line for each width option (≈ 50 / 66 / 80 is the readable range). */
@@ -121,6 +128,16 @@ export function normalizeSettings(raw: unknown): ReaderSettings {
     ),
     driftGuard: typeof input.driftGuard === 'boolean' ? input.driftGuard : d.driftGuard,
     driftSensitivity: oneOf(input.driftSensitivity, SENSITIVITIES, d.driftSensitivity),
+    readAloudRate: clamp(
+      input.readAloudRate,
+      LIMITS.readAloudRate.min,
+      LIMITS.readAloudRate.max,
+      d.readAloudRate,
+    ),
+    readAloudVoice:
+      typeof input.readAloudVoice === 'string' && input.readAloudVoice.length < 500
+        ? input.readAloudVoice
+        : null,
   };
 }
 

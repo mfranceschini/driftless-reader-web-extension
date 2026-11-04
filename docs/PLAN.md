@@ -9,8 +9,8 @@ Each phase ends with a build the test user loads unpacked in Edge and uses on re
 | 2   | Anchor marker & progress        | Dwell-based anchor marker, progress bar, learned time left, per-page resume                                                              | ✅     |
 | 3   | Drift Guard                     | Away / idle / skim detection, welcome-back recap card, rewind, sensitivity presets                                                       | ✅     |
 | 3.5 | Typography (from reading guide) | Bundled Lexend (default) & Atkinson Hyperlegible Next, Arial, Serif; 18px / 1.6 / 68ch defaults; letter & word spacing; WCAG 1.4.12 test | ✅     |
-| 4   | Read Aloud                      | Speech synthesis with word highlighting, click-to-start, speed                                                                           | ⏳     |
-| 5   | Focus band & Chunk mode         | Line dimming band (mouse/keyboard), one-section-at-a-time view                                                                           |        |
+| 4   | Read Aloud                      | Sentence-by-sentence speech, sentence + word highlights (CSS Highlight API), auto-follow, click-to-jump, speed & voice                   | ✅     |
+| 5   | Focus band & Chunk mode         | Line dimming band (mouse/keyboard), one-section-at-a-time view                                                                           | ⏳     |
 | 6   | Settings                        | Options page, keyboard shortcuts, onboarding                                                                                             |        |
 | 7   | Polish                          | Accessibility pass, ~20-site test corpus, performance                                                                                    |        |
 | 8   | Store submission                | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings                                                        |        |

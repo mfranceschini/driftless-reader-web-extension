@@ -4,6 +4,8 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   srcDir: '.',
   modules: ['@wxt-dev/module-react'],
+  // E2E builds swap in a fake speech engine (headless Chromium has no voices).
+  vite: () => ({ define: { __E2E__: JSON.stringify(process.env.E2E === '1') } }),
   manifest: {
     name: 'Driftless Reader',
     short_name: 'Driftless',

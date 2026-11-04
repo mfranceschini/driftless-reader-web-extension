@@ -292,5 +292,17 @@ export function useReadingSession(
     setState((prev) => ({ ...prev, resumeOffer: null }));
   }, []);
 
-  return { state, jumpToAnchor, acceptResume, startOver, dismissResume, getRecap };
+  const getBlocks = useCallback(() => sessionRef.current?.blocks ?? [], []);
+  const getCurrentBlock = useCallback(() => sessionRef.current?.tracker.snapshot.current ?? -1, []);
+
+  return {
+    state,
+    jumpToAnchor,
+    acceptResume,
+    startOver,
+    dismissResume,
+    getRecap,
+    getBlocks,
+    getCurrentBlock,
+  };
 }

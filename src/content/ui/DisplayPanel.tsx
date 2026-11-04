@@ -1,5 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { ensureFont, FONT_STACKS } from '../fonts';
+import { getVoices, sortVoicesForLang } from '../speech/voices';
 import {
   type DriftSensitivity,
   LIMITS,
@@ -13,6 +14,8 @@ import {
 interface DisplayPanelProps {
   settings: ReaderSettings;
   onChange(next: ReaderSettings): void;
+  /** Article language, to list matching voices first. */
+  lang?: string | null;
 }
 
 const THEMES: { value: Theme; label: string; text?: string }[] = [
@@ -119,7 +122,15 @@ function Segmented<T extends string>({
   );
 }
 
-export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
+export function DisplayPanel({ settings, onChange, lang }: DisplayPanelProps) {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  useEffect(() => {
+    let active = true;
+    void getVoices().then((list) => active && setVoices(sortVoicesForLang(list, lang)));
+    return () => {
+      active = false;
+    };
+  }, [lang]);
   const [moreOpen, setMoreOpen] = useState(settings.letterSpacing > 0 || settings.wordSpacing > 0);
   const set = <K extends keyof ReaderSettings>(key: K, value: ReaderSettings[K]) =>
     onChange({ ...settings, [key]: value });
@@ -191,6 +202,27 @@ export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
           {stepper('wordSpacing', 'Word spacing', (n) => (n === 0 ? '0' : `+${n.toFixed(2)}`))}
         </>
       )}
+
+      <p className="panel-section">Read Aloud</p>
+      {stepper('readAloudRate', 'Speed', (n) => `${n.toFixed(1)}×`)}
+      <div className="row">
+        <label className="row-label" htmlFor="driftless-voice">
+          Voice
+        </label>
+        <select
+          id="driftless-voice"
+          className="select"
+          value={settings.readAloudVoice ?? ''}
+          onChange={(e) => set('readAloudVoice', e.target.value || null)}
+        >
+          <option value="">Best match</option>
+          {voices.map((voice) => (
+            <option key={voice.voiceURI} value={voice.voiceURI}>
+              {voice.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <p className="panel-section">Drift Guard</p>
       <div className="row">

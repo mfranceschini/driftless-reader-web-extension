@@ -8,7 +8,12 @@ import {
 } from 'react';
 import type { Article } from '@/src/content/extract';
 import { formatTimeLeft } from '@/src/lib/reading-time';
-import { DEFAULT_SETTINGS, LINE_WIDTH_CH, type ReaderSettings } from '@/src/lib/settings';
+import {
+  DEFAULT_SETTINGS,
+  LINE_WIDTH_CH,
+  stepSetting,
+  type ReaderSettings,
+} from '@/src/lib/settings';
 import { loadSettings, saveSettings, watchSettings } from '@/src/lib/settings-store';
 import { pageKey } from '@/src/lib/page-key';
 import { ProgressBar } from './ProgressBar';
@@ -16,6 +21,8 @@ import { AnchorButton, ResumeCard } from './AnchorControls';
 import { useReadingSession, type SessionObserver } from './useReadingSession';
 import { useDriftGuard } from './useDriftGuard';
 import { DriftCard } from './DriftCard';
+import { Player } from './Player';
+import { useReadAloud } from './useReadAloud';
 import { DisplayPanel } from './DisplayPanel';
 import { ensureFont, FONT_STACKS } from '../fonts';
 
@@ -91,7 +98,24 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     suppressed: state.resumeOffer !== null,
     observerRef,
   });
-  const { card: driftCard, dismiss: dismissDrift } = drift;
+  const { card: driftCard, dismiss: dismissDrift, setPassive } = drift;
+
+  const readAloud = useReadAloud({
+    scrollRef: containerRef,
+    contentRef,
+    shadowRoot: () => (containerRef.current?.getRootNode() as ShadowRoot | undefined) ?? null,
+    getBlocks: session.getBlocks,
+    getCurrentBlock: session.getCurrentBlock,
+    lang: article.lang,
+    rate: settings.readAloudRate,
+    voiceURI: settings.readAloudVoice,
+  });
+  const playerOpen = readAloud.state.status !== 'idle';
+
+  // Listening counts as reading: Drift Guard stays quiet while the voice plays.
+  useEffect(() => {
+    setPassive(readAloud.state.status === 'playing');
+  }, [readAloud.state.status, setPassive]);
 
   // Esc closes a card or the panel first, then the reader. Listen at the document level
   // (capture) so it works even if focus was lost, e.g. after the panel closes.
@@ -122,7 +146,7 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   return (
     <div
       ref={containerRef}
-      className={`reader theme-${settings.theme}`}
+      className={`reader theme-${settings.theme}${playerOpen ? ' with-player' : ''}`}
       style={style}
       role="dialog"
       aria-modal="true"
@@ -133,6 +157,29 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
         <span className="meta" aria-live="off">
           {meta}
         </span>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={playerOpen ? 'Pause or resume Read Aloud' : 'Read aloud'}
+          aria-pressed={readAloud.state.status === 'playing'}
+          title="Read aloud"
+          onClick={() => (playerOpen ? readAloud.toggle() : void readAloud.start())}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 5 6 9H2v6h4l5 4V5z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />
+          </svg>
+        </button>
         <button
           ref={displayButtonRef}
           type="button"
@@ -154,7 +201,9 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
         >
           ✕
         </button>
-        {panelOpen && <DisplayPanel settings={settings} onChange={updateSettings} />}
+        {panelOpen && (
+          <DisplayPanel settings={settings} onChange={updateSettings} lang={article.lang} />
+        )}
         <ProgressBar percent={state.percent} />
       </div>
 
@@ -187,6 +236,29 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
 
       {!state.resumeOffer && !driftCard && state.anchorOffscreen && (
         <AnchorButton direction={state.anchorOffscreen} onClick={session.jumpToAnchor} />
+      )}
+      {readAloud.state.unavailable && (
+        <div className="card" role="alert">
+          <p className="card-title">No voices available</p>
+          <p className="card-body">
+            Your system has no text-to-speech voices installed. In Edge, voices come from Windows or
+            macOS speech settings.
+          </p>
+        </div>
+      )}
+
+      {playerOpen && (
+        <Player
+          state={readAloud.state}
+          rate={settings.readAloudRate}
+          onToggle={readAloud.toggle}
+          onPrev={readAloud.prev}
+          onNext={readAloud.next}
+          onFollow={readAloud.follow}
+          onSlower={() => updateSettings(stepSetting(settings, 'readAloudRate', -1))}
+          onFaster={() => updateSettings(stepSetting(settings, 'readAloudRate', 1))}
+          onClose={readAloud.stop}
+        />
       )}
     </div>
   );

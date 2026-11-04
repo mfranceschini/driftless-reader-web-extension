@@ -100,6 +100,11 @@ export class DriftDetector {
 
   /** Tab visibility or window focus changed. */
   setPresent(present: boolean, now: number): void {
+    // Listening to Read Aloud from another tab is still reading.
+    if (this.passive) {
+      this.awaySince = null;
+      return;
+    }
     if (!present) {
       if (this.awaySince === null) this.awaySince = now;
       return;

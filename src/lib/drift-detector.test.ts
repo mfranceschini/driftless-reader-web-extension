@@ -62,6 +62,14 @@ describe('idle detection', () => {
     expect(detector.isIdle).toBe(true);
   });
 
+  it('does not report "away" while passive (listening from another tab)', () => {
+    const { detector, onDrift } = make();
+    detector.setPassive(true, 0);
+    detector.setPresent(false, 0);
+    detector.setPresent(true, 10 * balanced.awayMs);
+    expect(onDrift).not.toHaveBeenCalled();
+  });
+
   it('never goes idle while passive (e.g. Read Aloud playing)', () => {
     const { detector } = make();
     detector.setPassive(true, 0);
