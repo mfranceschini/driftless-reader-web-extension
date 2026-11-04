@@ -8,3 +8,5 @@ Driftless Reader bundles the following open-source software:
 | React / React DOM    | MIT        | https://github.com/facebook/react      |
 
 The full Apache License 2.0 text is available at https://www.apache.org/licenses/LICENSE-2.0.
+
+Font license texts are bundled at `public/fonts/*-OFL.txt`. Font files come from [Fontsource](https://fontsource.org) (`@fontsource-variable/*`, latin + latin-ext subsets) and are refreshed with `node scripts/copy-fonts.mjs`.

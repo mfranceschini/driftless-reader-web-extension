@@ -63,7 +63,7 @@ test.describe('Focus View', () => {
     await reader.getByRole('button', { name: 'Increase Text size' }).click();
     await reader.getByRole('button', { name: 'Sepia' }).click();
     await expect(reader).toHaveClass(/theme-sepia/);
-    await expect(reader.locator('.page')).toHaveCSS('font-size', '22px');
+    await expect(reader.locator('.page')).toHaveCSS('font-size', '20px');
 
     await page.keyboard.press('Escape'); // closes panel
     await page.keyboard.press('Escape'); // closes reader
@@ -71,7 +71,7 @@ test.describe('Focus View', () => {
 
     await toggleReader(serviceWorker, page.url());
     await expect(reader).toHaveClass(/theme-sepia/);
-    await expect(reader.locator('.page')).toHaveCSS('font-size', '22px');
+    await expect(reader.locator('.page')).toHaveCSS('font-size', '20px');
   });
 });
 

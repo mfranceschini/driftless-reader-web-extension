@@ -15,7 +15,13 @@ createServer(async (req, res) => {
   );
   try {
     const body = await readFile(join(root, path));
-    res.writeHead(200, { 'content-type': types[extname(path)] ?? 'application/octet-stream' });
+    const headers = { 'content-type': types[extname(path)] ?? 'application/octet-stream' };
+    // *.csp.html fixtures simulate sites with a strict Content-Security-Policy.
+    if (path.endsWith('.csp.html')) {
+      headers['content-security-policy'] =
+        "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; font-src 'self'";
+    }
+    res.writeHead(200, headers);
     res.end(body);
   } catch {
     res.writeHead(404).end('not found');

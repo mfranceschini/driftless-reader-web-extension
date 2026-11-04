@@ -28,7 +28,7 @@ export default tseslint.config(
     rules: reactHooks.configs.recommended.rules,
   },
   {
-    files: ['e2e/**/*.{ts,mjs}', '*.config.{ts,js}'],
+    files: ['e2e/**/*.{ts,mjs}', 'scripts/**/*.mjs', '*.config.{ts,js}'],
     languageOptions: { globals: globals.node },
   },
 );

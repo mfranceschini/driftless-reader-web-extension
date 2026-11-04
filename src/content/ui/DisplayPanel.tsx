@@ -1,3 +1,5 @@
+import { useEffect, useState, type CSSProperties } from 'react';
+import { ensureFont, FONT_STACKS } from '../fonts';
 import {
   type DriftSensitivity,
   LIMITS,
@@ -21,9 +23,10 @@ const THEMES: { value: Theme; label: string; text?: string }[] = [
 ];
 
 const FONTS: { value: FontFamily; label: string }[] = [
-  { value: 'sans', label: 'Sans' },
+  { value: 'lexend', label: 'Lexend' },
+  { value: 'atkinson', label: 'Atkinson' },
+  { value: 'arial', label: 'Arial' },
   { value: 'serif', label: 'Serif' },
-  { value: 'mono', label: 'Mono' },
 ];
 
 const SENSITIVITY: { value: DriftSensitivity; label: string }[] = [
@@ -88,11 +91,13 @@ function Segmented<T extends string>({
   options,
   value,
   onSelect,
+  optionStyle,
 }: {
   label: string;
   options: { value: T; label: string }[];
   value: T;
   onSelect(value: T): void;
+  optionStyle?(value: T): CSSProperties;
 }) {
   return (
     <div className="row">
@@ -104,6 +109,7 @@ function Segmented<T extends string>({
             type="button"
             aria-pressed={option.value === value}
             onClick={() => onSelect(option.value)}
+            style={optionStyle?.(option.value)}
           >
             {option.label}
           </button>
@@ -114,8 +120,24 @@ function Segmented<T extends string>({
 }
 
 export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
+  const [moreOpen, setMoreOpen] = useState(settings.letterSpacing > 0 || settings.wordSpacing > 0);
   const set = <K extends keyof ReaderSettings>(key: K, value: ReaderSettings[K]) =>
     onChange({ ...settings, [key]: value });
+  const stepper = (key: keyof typeof LIMITS, label: string, format: (n: number) => string) => (
+    <Stepper
+      label={label}
+      value={format(settings[key])}
+      onDown={() => onChange(stepSetting(settings, key, -1))}
+      onUp={() => onChange(stepSetting(settings, key, 1))}
+      atMin={settings[key] <= LIMITS[key].min}
+      atMax={settings[key] >= LIMITS[key].max}
+    />
+  );
+
+  // Preview each font option in its own typeface.
+  useEffect(() => {
+    for (const font of FONTS) void ensureFont(font.value);
+  }, []);
 
   return (
     <div id="driftless-display-panel" className="panel" role="group" aria-label="Display settings">
@@ -141,34 +163,12 @@ export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
         options={FONTS}
         value={settings.fontFamily}
         onSelect={(v) => set('fontFamily', v)}
+        optionStyle={(v) => ({ fontFamily: FONT_STACKS[v] })}
       />
 
-      <Stepper
-        label="Text size"
-        value={`${settings.fontSize}px`}
-        onDown={() => onChange(stepSetting(settings, 'fontSize', -1))}
-        onUp={() => onChange(stepSetting(settings, 'fontSize', 1))}
-        atMin={settings.fontSize <= LIMITS.fontSize.min}
-        atMax={settings.fontSize >= LIMITS.fontSize.max}
-      />
-
-      <Stepper
-        label="Line spacing"
-        value={settings.lineHeight.toFixed(1)}
-        onDown={() => onChange(stepSetting(settings, 'lineHeight', -1))}
-        onUp={() => onChange(stepSetting(settings, 'lineHeight', 1))}
-        atMin={settings.lineHeight <= LIMITS.lineHeight.min}
-        atMax={settings.lineHeight >= LIMITS.lineHeight.max}
-      />
-
-      <Stepper
-        label="Paragraph gap"
-        value={settings.paragraphSpacing.toFixed(1)}
-        onDown={() => onChange(stepSetting(settings, 'paragraphSpacing', -1))}
-        onUp={() => onChange(stepSetting(settings, 'paragraphSpacing', 1))}
-        atMin={settings.paragraphSpacing <= LIMITS.paragraphSpacing.min}
-        atMax={settings.paragraphSpacing >= LIMITS.paragraphSpacing.max}
-      />
+      {stepper('fontSize', 'Text size', (n) => `${n}px`)}
+      {stepper('lineHeight', 'Line spacing', (n) => n.toFixed(1))}
+      {stepper('paragraphSpacing', 'Paragraph gap', (n) => n.toFixed(1))}
 
       <Segmented
         label="Line width"
@@ -176,6 +176,21 @@ export function DisplayPanel({ settings, onChange }: DisplayPanelProps) {
         value={settings.lineWidth}
         onSelect={(v) => set('lineWidth', v)}
       />
+
+      <button
+        type="button"
+        className="disclosure"
+        aria-expanded={moreOpen}
+        onClick={() => setMoreOpen((open) => !open)}
+      >
+        <span aria-hidden="true">{moreOpen ? '▾' : '▸'}</span> More text options
+      </button>
+      {moreOpen && (
+        <>
+          {stepper('letterSpacing', 'Letter spacing', (n) => (n === 0 ? '0' : `+${n.toFixed(2)}`))}
+          {stepper('wordSpacing', 'Word spacing', (n) => (n === 0 ? '0' : `+${n.toFixed(2)}`))}
+        </>
+      )}
 
       <p className="panel-section">Drift Guard</p>
       <div className="row">

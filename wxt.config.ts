@@ -15,6 +15,8 @@ export default defineConfig({
     // End-to-end tests can't "click" the toolbar to grant activeTab, so test
     // builds (E2E=1) get host access. Never set for store builds.
     ...(process.env.E2E === '1' ? { host_permissions: ['http://localhost/*'] } : {}),
+    // Bundled reading fonts (SIL OFL), fetched by the content script as bytes.
+    web_accessible_resources: [{ resources: ['fonts/*.woff2'], matches: ['<all_urls>'] }],
     action: {
       default_title: 'Driftless Reader',
     },

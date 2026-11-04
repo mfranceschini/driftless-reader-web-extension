@@ -17,12 +17,7 @@ import { useReadingSession, type SessionObserver } from './useReadingSession';
 import { useDriftGuard } from './useDriftGuard';
 import { DriftCard } from './DriftCard';
 import { DisplayPanel } from './DisplayPanel';
-
-const FONT_STACKS: Record<ReaderSettings['fontFamily'], string> = {
-  sans: 'system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  serif: 'Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif',
-  mono: 'ui-monospace, "Cascadia Mono", Consolas, "Liberation Mono", monospace',
-};
+import { ensureFont, FONT_STACKS } from '../fonts';
 
 export interface ReaderAppProps {
   article: Article;
@@ -64,6 +59,11 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     if (contentRef.current) contentRef.current.innerHTML = article.html;
   }, [article.html]);
 
+  // Load the chosen bundled font (Arial is shown until it's ready).
+  useEffect(() => {
+    void ensureFont(settings.fontFamily);
+  }, [settings.fontFamily]);
+
   // Move keyboard focus into the reader so Space / arrows scroll the article.
   useEffect(() => {
     containerRef.current?.focus({ preventScroll: true });
@@ -75,6 +75,8 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     '--line-height': settings.lineHeight,
     '--measure': LINE_WIDTH_CH[settings.lineWidth],
     '--para-space': `${settings.paragraphSpacing}em`,
+    '--letter-space': `${settings.letterSpacing}em`,
+    '--word-space': `${settings.wordSpacing}em`,
   } as CSSProperties;
 
   const [key] = useState(() => pageKey(location.href));
