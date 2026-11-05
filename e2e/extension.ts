@@ -20,6 +20,9 @@ export const test = base.extend<{ context: BrowserContext; serviceWorker: Worker
   context: async ({}, use) => {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
+      // Optional: use an already-installed Chromium instead of Playwright's
+      // own download (e.g. when the local browser build doesn't match).
+      ...(process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {}),
       args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
     });
     await use(context);
