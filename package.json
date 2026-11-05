@@ -2,7 +2,7 @@
   "name": "driftless-reader-web-extension",
   "displayName": "Driftless Reader",
   "description": "An ADHD-friendly reading companion: stay on track with Drift Guard, an anchor marker, read-aloud highlighting, Focus View, focus band and progress.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "license": "MIT",

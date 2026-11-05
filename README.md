@@ -19,7 +19,7 @@ Most reading tools change how text _looks_. Driftless Reader focuses on what act
 | 🔦 **Focus band & Chunk mode**   | Dims everything except the lines you're on, or shows one section at a time.                                                        |
 | 📊 **Progress bar**              | Shows how far you are and how much time is left.                                                                                   |
 
-> Status: 🚧 early development. See [docs/PLAN.md](docs/PLAN.md).
+> Status: **1.0.0** — submitting to Microsoft Edge Add-ons and the Chrome Web Store. See [CHANGELOG.md](CHANGELOG.md), [docs/PLAN.md](docs/PLAN.md) and the [privacy policy](PRIVACY.md).
 
 ## Privacy
 

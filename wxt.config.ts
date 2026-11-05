@@ -10,7 +10,7 @@ export default defineConfig({
     name: 'Driftless Reader',
     short_name: 'Driftless',
     description:
-      'ADHD-friendly reading: Drift Guard, anchor marker, read-aloud highlighting, Focus View, focus band and progress.',
+      'ADHD-friendly reading: stay with long articles using Drift Guard, an anchor marker, Read Aloud, Focus View and Chunk mode.',
     // Least-privilege: no host permissions. The reader is injected only into
     // the tab the user activates (toolbar click or keyboard shortcut).
     permissions: ['activeTab', 'scripting', 'storage'],

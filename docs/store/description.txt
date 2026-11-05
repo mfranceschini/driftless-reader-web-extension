@@ -1,0 +1,34 @@
+Stay with the text.
+
+Driftless Reader is a calm, distraction-free way to read long articles on the web, designed with ADHD readers in mind. It helps you start, keep going, and get back on track when your mind wanders.
+
+WHAT IT DOES
+
+• Focus View — shows the article in a clean, comfortable layout without ads, menus or sidebars.
+
+• Chunk mode — shows one small piece of the article at a time and fades the rest. Press Space for the next piece.
+
+• Drift Guard — notices when you switch tabs, stop reading, or skim far ahead, and gently shows "Welcome back" with the last thing you read and a one-click way back.
+
+• Anchor marker — a small amber bar marks the last paragraph you actually read (not just scrolled past), and the reader remembers it so you can pick up where you left off.
+
+• Read Aloud — listens along with you, highlighting each sentence and word, and keeps the text on screen. Uses your browser's voices.
+
+• Focus band — dims everything except the few lines you're reading. Also works on pages that aren't articles.
+
+• Progress and time left — see how far you are and how long is left, based on your own reading speed.
+
+• Comfortable typography — Lexend, Atkinson Hyperlegible Next, Arial or serif; text size, line spacing, letter and word spacing, line width; light, sepia, dark or automatic themes.
+
+KEYBOARD SHORTCUTS (customizable)
+Alt+Shift+D open/close · Alt+Shift+S Read Aloud · Alt+Shift+F focus band · Alt+Shift+K Chunk mode
+
+PRIVATE BY DESIGN
+• Runs only on the page where you start it — no access to other tabs or your browsing history.
+• No accounts, servers, analytics or tracking. Settings stay in your browser; reading positions are stored as one-way hashes, never as page addresses or text.
+• Voices marked "(online)" are provided by your browser and send the text being read to their provider; pick any other voice to keep everything on your device.
+
+FREE AND OPEN SOURCE
+MIT licensed. Source code, issues and suggestions: https://github.com/mfranceschini/driftless-reader-web-extension
+
+Driftless Reader is a reading aid, not a medical device or treatment. Everyone reads differently — try the tools and keep what helps.
