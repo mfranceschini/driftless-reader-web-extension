@@ -12,7 +12,7 @@ export type FocusBandLines = 1 | 3 | 5;
 export type FocusBandMode = 'line' | 'pointer';
 
 /** Bump when defaults change in a way existing users should receive. */
-export const SETTINGS_VERSION = 2;
+export const SETTINGS_VERSION = 3;
 
 export interface ReaderSettings {
   version: number;
@@ -63,7 +63,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   focusBand: false,
   focusBandLines: 3,
   focusBandMode: 'line',
-  chunkMode: false,
+  chunkMode: true,
   glass: true,
 };
 
@@ -109,15 +109,21 @@ export function normalizeSettings(raw: unknown): ReaderSettings {
   let input = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<string, unknown>>;
   const d = DEFAULT_SETTINGS;
 
+  const stored = Object.keys(input).length > 0;
+  const version = typeof input.version === 'number' ? input.version : 1;
+
   // v1 → v2: the reading defaults changed to Lexend / 18px / 1.6 / 68ch.
   // Reset typography once, but keep theme and Drift Guard choices.
-  if (input.version !== SETTINGS_VERSION && Object.keys(input).length > 0) {
+  if (stored && version < 2) {
     input = {
       theme: input.theme,
       driftGuard: input.driftGuard,
       driftSensitivity: input.driftSensitivity,
     };
   }
+
+  // v2 → v3: Chunk mode became the default; turn it on once, keep the rest.
+  if (stored && version < 3) input = { ...input, chunkMode: true };
 
   return {
     version: SETTINGS_VERSION,

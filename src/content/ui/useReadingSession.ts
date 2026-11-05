@@ -82,6 +82,7 @@ export function useReadingSession(
 ) {
   const [state, setState] = useState<ReadingSessionState>(INITIAL);
   const sessionRef = useRef<Session | null>(null);
+  const finishRef = useRef<(() => void) | null>(null);
 
   const markAnchor = useCallback((index: number) => {
     const session = sessionRef.current;
@@ -121,11 +122,13 @@ export function useReadingSession(
     let lastSave = 0;
     let saveTimer = 0;
     let lastReported = -2;
+    let finished = false;
 
     const blocks = indexBlocks(content);
     const stats = buildBlockStats(blocks.map((b) => b.words));
 
     function persist(session: Session, force = false) {
+      if (finished) return; // a closed reader must never write again
       const { anchor } = session.tracker.snapshot;
       const block = session.blocks[anchor];
       if (!block) return;
@@ -237,18 +240,29 @@ export function useReadingSession(
       measure();
     })();
 
+    /**
+     * Saves the final position and stops tracking. Called as soon as the
+     * reader starts closing — not after its fade-out — so a reader reopened
+     * meanwhile (e.g. "Start over") can't be overwritten by this one.
+     */
+    const finish = () => {
+      if (finished) return;
+      window.clearInterval(interval);
+      window.clearTimeout(saveTimer);
+      const session = sessionRef.current;
+      if (session) persist(session, true);
+      finished = true;
+    };
+    finishRef.current = finish;
+
     return () => {
+      finish();
       disposed = true;
       cancelAnimationFrame(frame);
-      window.clearInterval(interval);
       scroller.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
-      const session = sessionRef.current;
-      if (session) {
-        window.clearTimeout(saveTimer);
-        persist(session, true);
-      }
       sessionRef.current = null;
+      finishRef.current = null;
     };
   }, [ready, pageKey, scrollRef, contentRef, markAnchor, observerRef]);
 
@@ -309,6 +323,8 @@ export function useReadingSession(
   }, []);
 
   const getBlocks = useCallback(() => sessionRef.current?.blocks ?? [], []);
+  /** Save now and stop tracking (the reader is closing). */
+  const finish = useCallback(() => finishRef.current?.(), []);
   const getCurrentBlock = useCallback(() => sessionRef.current?.tracker.snapshot.current ?? -1, []);
 
   return {
@@ -321,5 +337,6 @@ export function useReadingSession(
     getBlocks,
     getCurrentBlock,
     scrollToBlockAt,
+    finish,
   };
 }

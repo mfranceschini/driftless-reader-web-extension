@@ -55,6 +55,27 @@ describe('settings migration', () => {
     });
   });
 
+  it('moves v2 users to Chunk mode on, keeping every other setting', () => {
+    const v2 = {
+      version: 2,
+      theme: 'sepia',
+      fontFamily: 'atkinson',
+      fontSize: 22,
+      chunkMode: false,
+    };
+    expect(normalizeSettings(v2)).toMatchObject({
+      version: v,
+      theme: 'sepia',
+      fontFamily: 'atkinson',
+      fontSize: 22,
+      chunkMode: true,
+    });
+  });
+
+  it('respects turning Chunk mode off after the migration', () => {
+    expect(normalizeSettings({ version: v, chunkMode: false }).chunkMode).toBe(false);
+  });
+
   it('defaults to Lexend, 18px, 1.6 line height and a 68ch column', () => {
     expect(DEFAULT_SETTINGS).toMatchObject({
       fontFamily: 'lexend',

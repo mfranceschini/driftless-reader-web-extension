@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 import type { Article } from '@/src/content/extract';
 import { formatTimeLeft } from '@/src/lib/reading-time';
 import { LINE_WIDTH_CH, stepSetting } from '@/src/lib/settings';
@@ -21,14 +28,36 @@ import { DisplayPanel } from './DisplayPanel';
 import { useReaderSettings } from './useReaderSettings';
 import { ensureFont, FONT_STACKS } from '../fonts';
 
+/** Matches the `reader-out` animation in reader.css. */
+const CLOSE_ANIMATION_MS = 160;
+
 export interface ReaderAppProps {
   article: Article;
   onClose(): void;
+  onCloseStart?(): void;
 }
 
-export function ReaderApp({ article, onClose }: ReaderAppProps) {
+export function ReaderApp({ article, onClose: closeNow, onCloseStart }: ReaderAppProps) {
   const [settings, updateSettings] = useReaderSettings();
   const [panelOpen, setPanelOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  // Graceful close: a short fade-out, then unmount. Instant with reduced motion.
+  const closingRef = useRef(false);
+  // Set once the reading session exists (declared further down).
+  const finishSessionRef = useRef<() => void>(() => {});
+  const onClose = useCallback(() => {
+    if (closingRef.current) return; // a second Esc / ✕ during the fade-out
+    closingRef.current = true;
+    finishSessionRef.current(); // save position now, before the fade-out
+    onCloseStart?.();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      closeNow();
+      return;
+    }
+    setClosing(true);
+    window.setTimeout(closeNow, CLOSE_ANIMATION_MS);
+  }, [closeNow, onCloseStart]);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const displayButtonRef = useRef<HTMLButtonElement>(null);
@@ -63,6 +92,10 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   const observerRef = useRef<SessionObserver | null>(null);
   const session = useReadingSession(containerRef, contentRef, key, true, observerRef);
   const { state } = session;
+  const finishSession = session.finish;
+  useEffect(() => {
+    finishSessionRef.current = finishSession;
+  }, [finishSession]);
   const drift = useDriftGuard({
     enabled: settings.driftGuard,
     sensitivity: settings.driftSensitivity,
@@ -175,7 +208,7 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   return (
     <div
       ref={containerRef}
-      className={`reader theme-${settings.theme}${playerOpen ? ' with-player' : ''}${settings.chunkMode ? ' chunk-mode' : ''}`}
+      className={`reader theme-${settings.theme}${playerOpen ? ' with-player' : ''}${settings.chunkMode ? ' chunk-mode' : ''}${closing ? ' closing' : ''}`}
       style={style}
       role="dialog"
       aria-modal="true"

@@ -63,6 +63,10 @@ test.describe('Keyboard commands', () => {
     await runCommand(serviceWorker, page.url(), 'focus-band');
     await expect(root.locator('.focus-band-edge')).toHaveCount(0);
 
+    // Chunk mode is on by default: the shortcut turns it off, then on again.
+    await expect(root.locator('.chunk-pos')).toBeVisible();
+    await runCommand(serviceWorker, page.url(), 'chunk-mode');
+    await expect(root.locator('.chunk-pos')).toHaveCount(0);
     await runCommand(serviceWorker, page.url(), 'chunk-mode');
     await expect(root.locator('.chunk-pos')).toBeVisible();
   });

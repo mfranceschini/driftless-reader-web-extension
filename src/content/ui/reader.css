@@ -1070,3 +1070,137 @@
   font-size: 12.5px;
   line-height: 1.4;
 }
+
+/* ==========================================================================
+   Motion — small, purposeful animations.
+   Each one either confirms an action (anchor saved, mode switched) or
+   keeps you oriented (where something came from / went). All of them are
+   skipped when the system asks for reduced motion.
+   ========================================================================== */
+.reader {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Opening: the calm background covers the page instantly (no moment
+     where the busy original page shows through), then the article rises
+     into place. */
+  .reader {
+    animation: none;
+  }
+  .reader .page {
+    animation: page-rise 320ms var(--ease-out);
+  }
+  @keyframes page-rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* Closing: a quick fade so the page underneath doesn't jump in. */
+  .reader.closing {
+    animation: reader-out 160ms ease-in forwards;
+    pointer-events: none;
+  }
+  @keyframes reader-out {
+    to {
+      opacity: 0;
+      transform: scale(0.99);
+    }
+  }
+
+  /* The Aa panel unfolds from the button that opened it. */
+  .panel {
+    transform-origin: top right;
+    animation: panel-in 180ms var(--ease-out);
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+    }
+  }
+
+  /* Player, chunk control and "back" button rise from the bottom edge. */
+  .player,
+  .anchor-btn {
+    animation: rise-centered 240ms var(--ease-out);
+  }
+  .chunk-nav {
+    animation: rise 240ms var(--ease-out);
+  }
+  @keyframes rise-centered {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 14px);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+
+  /* Cards (Welcome back, resume, skimming) arrive with a gentle settle. */
+  .card {
+    animation: card-in 280ms var(--ease-soft-spring);
+  }
+
+  /* Anchor saved: the amber bar grows in, a quiet "got it". */
+  .content .dl-anchor::before {
+    transform-origin: top;
+    animation: anchor-grow 360ms var(--ease-soft-spring);
+  }
+  @keyframes anchor-grow {
+    from {
+      transform: scaleY(0);
+      opacity: 0;
+    }
+  }
+
+  /* Chunk mode: pieces fade in and out smoothly in both directions. */
+  .content * {
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  /* Focus band glides instead of jumping between lines. */
+  .focus-band-dim,
+  .focus-band-edge {
+    transition:
+      top 140ms var(--ease-out),
+      height 140ms var(--ease-out);
+  }
+
+  /* Controls: state changes ease instead of snapping. */
+  .icon-btn,
+  .seg button,
+  .swatch,
+  .btn,
+  .switch,
+  .anchor-btn,
+  .pill-seg button {
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      transform 120ms ease;
+  }
+  .icon-btn:active,
+  .btn:active,
+  .anchor-btn:active,
+  .player .play:active {
+    transform: scale(0.94);
+  }
+  .anchor-btn:active {
+    transform: translateX(-50%) scale(0.96);
+  }
+
+  /* Progress bar fill eases forward. */
+  .progress-fill {
+    transition: transform 360ms var(--ease-out);
+  }
+}

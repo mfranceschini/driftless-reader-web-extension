@@ -79,7 +79,11 @@ test.describe('Chunk mode', () => {
   }) => {
     const root = await open(page, serviceWorker);
     await expect(root.locator('.reader')).toBeVisible();
-    await root.getByRole('button', { name: 'Chunk mode' }).click();
+    // On by default.
+    await expect(root.getByRole('button', { name: 'Chunk mode' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
     const pos = root.locator('.chunk-pos');
     await expect(pos).toHaveText(/^1 \/ \d+$/);
     const total = Number((await pos.textContent())!.split('/')[1]);
@@ -103,15 +107,17 @@ test.describe('Chunk mode', () => {
     await expect(pos).toHaveCount(0);
   });
 
-  test('remembers the setting next time', async ({ page, serviceWorker }) => {
+  test('remembers turning it off', async ({ page, serviceWorker }) => {
     const root = await open(page, serviceWorker);
     await root.getByRole('button', { name: 'Chunk mode' }).click();
+    await expect(root.locator('.chunk-pos')).toHaveCount(0);
     await page.keyboard.press('Escape');
+    await expect(root).toHaveCount(0);
     await toggleReader(serviceWorker, page.url());
     await expect(root.getByRole('button', { name: 'Chunk mode' })).toHaveAttribute(
       'aria-pressed',
-      'true',
+      'false',
     );
-    await expect(root.locator('.chunk-pos')).toHaveText(/^1 \//);
+    await expect(root.locator('.content .dl-dim')).toHaveCount(0);
   });
 });

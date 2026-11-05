@@ -30,6 +30,33 @@ test.describe('Focus View', () => {
     );
   });
 
+  test('reopening during the close animation opens a fresh reader', async ({
+    page,
+    serviceWorker,
+  }) => {
+    await page.goto('/article.html');
+    await toggleReader(serviceWorker, page.url());
+    const root = page.locator(host);
+    await expect(root.locator('.reader')).toBeVisible();
+    await page.keyboard.press('Escape'); // starts the ~160ms fade-out
+    await toggleReader(serviceWorker, page.url()); // pressed again right away
+    await expect(root).toHaveCount(1);
+    await expect(root.locator('.reader:not(.closing)')).toBeVisible();
+    await page.waitForTimeout(400); // the old reader's delayed cleanup must not remove the new one
+    await expect(root.locator('.reader')).toBeVisible();
+  });
+
+  test('closes instantly with reduced motion', async ({ page, serviceWorker }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/article.html');
+    await toggleReader(serviceWorker, page.url());
+    const root = page.locator(host);
+    await expect(root.locator('.reader')).toBeVisible();
+    await expect(root.locator('.page')).toHaveCSS('animation-name', 'none');
+    await page.keyboard.press('Escape');
+    await expect(root).toHaveCount(0, { timeout: 100 });
+  });
+
   test('toggling again closes the reader', async ({ page, serviceWorker }) => {
     await page.goto('/article.html');
     await toggleReader(serviceWorker, page.url());

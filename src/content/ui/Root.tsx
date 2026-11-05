@@ -10,6 +10,8 @@ import { loadSettings, watchSettings } from '@/src/lib/settings-store';
 export interface RootProps {
   initialArticle: Article | null;
   onClose(): void;
+  /** Called when a closing animation starts (before onClose). */
+  onCloseStart?(): void;
 }
 
 /** Locks the page's own scrolling while Focus View covers it. */
@@ -51,7 +53,7 @@ export function Root(props: RootProps) {
   );
 }
 
-function RootContent({ initialArticle, onClose }: RootProps) {
+function RootContent({ initialArticle, onClose, onCloseStart }: RootProps) {
   const [article, setArticle] = useState<Article | null>(initialArticle);
   const [failed, setFailed] = useState(false);
   const [pageBand, setPageBand] = useState(false);
@@ -65,7 +67,7 @@ function RootContent({ initialArticle, onClose }: RootProps) {
   }, [article]);
   usePageScrollLock(article !== null);
 
-  if (article) return <ReaderApp article={article} onClose={onClose} />;
+  if (article) return <ReaderApp article={article} onClose={onClose} onCloseStart={onCloseStart} />;
 
   if (pageBand) return <PageFocusBand onClose={onClose} />;
 

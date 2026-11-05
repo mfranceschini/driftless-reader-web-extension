@@ -10,6 +10,8 @@ import styles from './ui/reader.css?raw';
 import { SHADOW_MODE } from './security';
 
 export interface ReaderShell {
+  /** Stop counting as "the open reader" (closing animation started). */
+  release(): void;
   destroy(): void;
 }
 
@@ -31,15 +33,30 @@ export function mountReaderShell(initialArticle: Article | null): ReaderShell {
   const previousFocus = document.activeElement as HTMLElement | null;
   const root = createRoot(mountPoint);
 
+  let destroyed = false;
   const shell: ReaderShell = {
+    release() {
+      // A shortcut pressed during the fade-out must open a new reader,
+      // not "close" the one already on its way out.
+      if (window.__driftlessReader === shell) window.__driftlessReader = undefined;
+    },
     destroy() {
+      if (destroyed) return;
+      destroyed = true;
+      shell.release();
       root.unmount();
       host.remove();
-      previousFocus?.focus?.({ preventScroll: true });
-      if (window.__driftlessReader === shell) window.__driftlessReader = undefined;
+      // Don't steal focus from a reader that was reopened meanwhile.
+      if (!window.__driftlessReader) previousFocus?.focus?.({ preventScroll: true });
     },
   };
 
-  root.render(<Root initialArticle={initialArticle} onClose={() => shell.destroy()} />);
+  root.render(
+    <Root
+      initialArticle={initialArticle}
+      onCloseStart={() => shell.release()}
+      onClose={() => shell.destroy()}
+    />,
+  );
   return shell;
 }
