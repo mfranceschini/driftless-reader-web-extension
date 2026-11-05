@@ -28,7 +28,7 @@ AI features, PDFs, site blocking, mobile, accounts/sync.
 
 1. **Drift first.** Every feature is judged by whether it helps the reader stay with, or return to, the text.
 2. **Calm, not naggy.** Nudges are gentle, rare and easy to turn off.
-3. **Private by default.** No network requests (fonts are bundled, never loaded from a CDN); local storage only.
+3. **Private by default.** No network requests from the extension (fonts are bundled, never loaded from a CDN); local storage only, positions hashed. Online TTS voices are labelled and disclosed. See SECURITY.md.
 4. **Works without Focus View.** Focus band, Read Aloud and progress also work on the original page when an article can't be extracted.
 
 5. **No medical claims.** Fonts and features are offered as options to try, not as ADHD treatments.

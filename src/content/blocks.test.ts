@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { indexBlocks, resolveSavedAnchor } from './blocks';
+import { privateId } from '@/src/lib/hash';
 
 function container(html: string): HTMLElement {
   const div = document.createElement('div');
@@ -31,14 +32,18 @@ describe('resolveSavedAnchor', () => {
   const blocks = indexBlocks(container('<p>Alpha text</p><p>Beta text</p><p>Gamma text</p>'));
 
   it('uses the saved index when the text still matches', () => {
-    expect(resolveSavedAnchor(blocks, 1, 'Beta text')).toBe(1);
+    expect(resolveSavedAnchor(blocks, 1, privateId('Beta text'))).toBe(1);
   });
 
   it('finds the block by text if the page changed', () => {
-    expect(resolveSavedAnchor(blocks, 0, 'Gamma text')).toBe(2);
+    expect(resolveSavedAnchor(blocks, 0, privateId('Gamma text'))).toBe(2);
   });
 
   it('returns -1 when the block is gone', () => {
-    expect(resolveSavedAnchor(blocks, 1, 'Deleted paragraph')).toBe(-1);
+    expect(resolveSavedAnchor(blocks, 1, privateId('Deleted paragraph'))).toBe(-1);
+  });
+
+  it('never exposes the text in the stored fingerprint', () => {
+    expect(blocks[1]!.fingerprintId).not.toContain('Beta');
   });
 });

@@ -1,4 +1,4 @@
-import type { ReaderCommand } from '@/src/lib/commands';
+import { isReaderCommand, type ReaderCommand } from '@/src/lib/commands';
 
 /**
  * Delivers keyboard commands from the background to the open reader.
@@ -25,11 +25,14 @@ export function commandBus(): EventTarget {
 /** Subscribes to commands; also delivers a pending one immediately. Returns unsubscribe. */
 export function onReaderCommand(handler: (command: ReaderCommand) => void): () => void {
   const pending = window.__driftlessPending;
-  if (pending) {
+  if (isReaderCommand(pending)) {
     window.__driftlessPending = undefined;
     queueMicrotask(() => handler(pending));
   }
-  const listener = (event: Event) => handler((event as CustomEvent<ReaderCommand>).detail);
+  const listener = (event: Event) => {
+    const command = (event as CustomEvent<unknown>).detail;
+    if (isReaderCommand(command)) handler(command); // ignore anything unexpected
+  };
   commandBus().addEventListener(EVENT, listener);
   return () => commandBus().removeEventListener(EVENT, listener);
 }

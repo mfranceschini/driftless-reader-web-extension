@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import type { Article } from './extract';
 import { Root } from './ui/Root';
 import styles from './ui/reader.css?raw';
+import { SHADOW_MODE } from './security';
 
 export interface ReaderShell {
   destroy(): void;
@@ -19,7 +20,7 @@ export function mountReaderShell(initialArticle: Article | null): ReaderShell {
 
   const host = document.createElement('div');
   host.id = HOST_ID;
-  const shadow = host.attachShadow({ mode: 'open' });
+  const shadow = host.attachShadow({ mode: SHADOW_MODE });
 
   const style = document.createElement('style');
   style.textContent = styles;

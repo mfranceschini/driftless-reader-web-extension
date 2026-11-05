@@ -134,7 +134,7 @@ export function useReadingSession(
         const { percent } = progressAt(session.stats, anchor + 1);
         void savePosition(pageKey, {
           anchor,
-          fingerprint: block.fingerprint,
+          fingerprint: block.fingerprintId,
           totalBlocks: session.blocks.length,
           percent,
           updatedAt: lastSave,

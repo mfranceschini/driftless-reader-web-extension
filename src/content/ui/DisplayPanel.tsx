@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { ensureFont, FONT_STACKS } from '../fonts';
-import { getVoices, sortVoicesForLang } from '../speech/voices';
+import { getVoices, pickVoice, sortVoicesForLang } from '../speech/voices';
 import {
   type DriftSensitivity,
   type FocusBandMode,
@@ -138,6 +138,10 @@ function Segmented<T extends string>({
 
 export function DisplayPanel({ settings, onChange, lang, onOpenAllSettings }: DisplayPanelProps) {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  // The voice that will actually be used ("Best match" resolves to one).
+  const activeVoice = voices.length
+    ? pickVoice(voices, lang ?? null, settings.readAloudVoice)
+    : null;
   useEffect(() => {
     let active = true;
     void getVoices().then((list) => active && setVoices(sortVoicesForLang(list, lang)));
@@ -262,11 +266,18 @@ export function DisplayPanel({ settings, onChange, lang, onOpenAllSettings }: Di
           <option value="">Best match</option>
           {voices.map((voice) => (
             <option key={voice.voiceURI} value={voice.voiceURI}>
-              {voice.name}
+              {voice.localService ? voice.name : `${voice.name} (online)`}
             </option>
           ))}
         </select>
       </div>
+      {activeVoice && !activeVoice.localService && (
+        <p className="privacy-note" role="note">
+          This is an online voice: the text being read is sent to the voice provider (for
+          Edge&apos;s natural voices, Microsoft) to create the speech. Pick a voice without
+          &quot;(online)&quot; to keep everything on this device.
+        </p>
+      )}
 
       <p className="panel-section">Drift Guard</p>
       <div className="row">

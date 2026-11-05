@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { buildChunks, chunkOf } from '@/src/lib/chunks';
 import type { ReadingBlock } from '../blocks';
+import { isTrustedEvent } from '../security';
 
 const DIM_CLASS = 'dl-dim';
 /** Media that sit between text blocks and should dim with their chunk. */
@@ -114,6 +115,7 @@ export function useChunkMode({ enabled, contentRef, getBlocks, scrollToBlockAt }
   useEffect(() => {
     if (!enabled) return;
     const onKey = (event: KeyboardEvent) => {
+      if (!isTrustedEvent(event)) return;
       if (event.key !== ' ' || event.ctrlKey || event.metaKey || event.altKey) return;
       if (isFormTarget(event.composedPath()[0] ?? null)) return;
       event.preventDefault();

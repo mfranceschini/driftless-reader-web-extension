@@ -23,8 +23,14 @@ Most reading tools change how text _looks_. Driftless Reader focuses on what act
 
 ## Privacy
 
-- No accounts, no servers, no analytics. Everything stays in your browser's local storage.
+- No accounts, no servers, no analytics. Settings and reading positions stay in your browser's local storage; positions are stored as one-way hashes, never as readable URLs or page text.
+- The extension itself makes no network requests. **Exception you control:** if you pick an _online_ Read Aloud voice (for example Edge's "Online (Natural)" voices, marked "(online)" in the voice list), the browser sends the text being read to that voice provider to create the speech. Offline voices keep everything on your device.
+- Not detectable by websites: no files are exposed to pages, and the reader's UI is hidden from page scripts.
 - Minimal permissions: `activeTab`, `scripting`, `storage`. The extension only touches a page **after you start it** on that page.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the threat model and how to report a vulnerability.
 
 ## Development
 

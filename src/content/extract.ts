@@ -33,13 +33,30 @@ const FORBID_TAGS = [
 ];
 const FORBID_ATTR = ['style', 'class', 'id', 'width', 'height'];
 
+/**
+ * Links and images may only use web/mail/phone URLs or relative paths.
+ * Stricter than DOMPurify's default list (which also allows ftp:, sms:,
+ * cid:, xmpp:, …). data: images are still allowed via DATA_URI_TAGS.
+ */
+const ALLOWED_URI_REGEXP = /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
+
+/**
+ * Sanitizes page HTML before it's shown in Focus View. Page content is
+ * untrusted: this removes scripts, event handlers, javascript:/data: links,
+ * forms, embeds, styles, ids/classes (DOM clobbering) and known
+ * mutation-XSS vectors (see extract.test.ts for the payloads covered).
+ */
 export function sanitizeArticleHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     FORBID_TAGS,
     FORBID_ATTR,
     ALLOW_DATA_ATTR: false,
+    ALLOWED_URI_REGEXP,
   });
 }
+
+/** Very large pages are skipped instead of freezing the tab (hostile or huge DOMs). */
+export const MAX_ELEMENTS_TO_PARSE = 60_000;
 
 /**
  * Extracts the main article from a document with Mozilla Readability.
@@ -47,8 +64,17 @@ export function sanitizeArticleHtml(html: string): string {
  * Returns null when no readable article is found.
  */
 export function extractArticle(doc: Document): Article | null {
-  const clone = doc.cloneNode(true) as Document;
-  const parsed = new Readability(clone, { charThreshold: 300, keepClasses: false }).parse();
+  let parsed: ReturnType<Readability['parse']>;
+  try {
+    const clone = doc.cloneNode(true) as Document;
+    parsed = new Readability(clone, {
+      charThreshold: 300,
+      keepClasses: false,
+      maxElemsToParse: MAX_ELEMENTS_TO_PARSE,
+    }).parse();
+  } catch {
+    return null; // too large or malformed: fall back to the on-page tools
+  }
   if (!parsed?.content) return null;
 
   const html = sanitizeArticleHtml(parsed.content);

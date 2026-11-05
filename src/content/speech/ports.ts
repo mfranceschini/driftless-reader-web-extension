@@ -39,7 +39,11 @@ export function createSpeechSynthesisPort(): SpeechPort {
  * Deterministic fake for end-to-end tests (headless Chromium has no voices).
  * Only included in E2E builds.
  */
+/** Marker the release-build check looks for: must never appear in store builds. */
+export const FAKE_SPEECH_MARKER = 'driftless:e2e-fake-speech';
+
 export function createFakeSpeechPort(msPerWord = 60): SpeechPort {
+  console.debug(FAKE_SPEECH_MARKER);
   let timers: number[] = [];
   const clear = () => {
     timers.forEach((t) => window.clearTimeout(t));

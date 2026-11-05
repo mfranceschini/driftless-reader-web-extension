@@ -4,3 +4,10 @@ minimumReleaseAge: 10080
 onlyBuiltDependencies:
   - esbuild
   - spawn-sync
+
+# Security overrides for dev-only tooling (not shipped in the extension):
+# - happy-dom: GHSA advisories fixed in 21.0.4 (vitest pulls it in as a peer)
+# - minimatch: ReDoS/DoS advisory fixed in 11.0.1 (used by eslint)
+overrides:
+  happy-dom: 21.0.4
+  minimatch@<11.0.1: ^11.0.3

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import type { FocusBandLines, FocusBandMode } from '@/src/lib/settings';
 import { READING_LINE } from './useReadingSession';
+import { isTrustedEvent } from '../security';
 
 interface FocusBandProps {
   mode: FocusBandMode;
@@ -46,6 +47,7 @@ export function FocusBand({ mode, lines, lineHeightAt, scrollRef, className }: F
     let frame = 0;
     let lastY = center;
     const onMove = (event: PointerEvent) => {
+      if (!isTrustedEvent(event)) return;
       lastY = event.clientY;
       if (frame) return;
       frame = requestAnimationFrame(() => {

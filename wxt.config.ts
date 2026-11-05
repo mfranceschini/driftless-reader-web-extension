@@ -17,8 +17,13 @@ export default defineConfig({
     // End-to-end tests can't "click" the toolbar to grant activeTab, so test
     // builds (E2E=1) get host access. Never set for store builds.
     ...(process.env.E2E === '1' ? { host_permissions: ['http://localhost/*'] } : {}),
-    // Bundled reading fonts (SIL OFL), fetched by the content script as bytes.
-    web_accessible_resources: [{ resources: ['fonts/*.woff2'], matches: ['<all_urls>'] }],
+    // No web_accessible_resources on purpose: anything listed there can be
+    // fetched by any website, which lets sites detect the extension.
+    // Strict CSP for our own pages (options, welcome, popup).
+    content_security_policy: {
+      extension_pages:
+        "script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    },
     action: {
       default_title: 'Driftless Reader',
     },

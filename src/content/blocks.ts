@@ -1,4 +1,5 @@
 import { countWords } from '@/src/lib/reading-time';
+import { privateId } from '@/src/lib/hash';
 
 /** Elements that hold one readable unit of text. */
 const BLOCK_SELECTOR = 'p, li, h1, h2, h3, h4, h5, h6, blockquote, pre, figcaption, dt, dd, td, th';
@@ -7,8 +8,10 @@ export interface ReadingBlock {
   el: HTMLElement;
   index: number;
   words: number;
-  /** First ~80 characters of normalized text, used to re-find the block later. */
+  /** First ~80 characters of normalized text (kept in memory only). */
   fingerprint: string;
+  /** One-way hash of the fingerprint: what gets stored, never the text. */
+  fingerprintId: string;
 }
 
 export function fingerprintOf(text: string): string {
@@ -28,7 +31,14 @@ export function indexBlocks(container: HTMLElement): ReadingBlock[] {
     const text = el.textContent ?? '';
     const words = countWords(text);
     if (words === 0) continue;
-    blocks.push({ el, index: blocks.length, words, fingerprint: fingerprintOf(text) });
+    const fingerprint = fingerprintOf(text);
+    blocks.push({
+      el,
+      index: blocks.length,
+      words,
+      fingerprint,
+      fingerprintId: privateId(fingerprint),
+    });
   }
   return blocks;
 }
@@ -36,15 +46,15 @@ export function indexBlocks(container: HTMLElement): ReadingBlock[] {
 /**
  * Resolves a saved anchor to a block index on the current page: trusts the
  * saved index if its text still matches, otherwise searches by fingerprint.
- * Returns -1 if the block can't be found.
+ * Compares hashed fingerprints. Returns -1 if the block can't be found.
  */
 export function resolveSavedAnchor(
   blocks: readonly ReadingBlock[],
   savedIndex: number,
-  fingerprint: string,
+  fingerprintId: string,
 ): number {
-  if (blocks[savedIndex]?.fingerprint === fingerprint) return savedIndex;
-  const found = blocks.find((block) => block.fingerprint === fingerprint);
+  if (blocks[savedIndex]?.fingerprintId === fingerprintId) return savedIndex;
+  const found = blocks.find((block) => block.fingerprintId === fingerprintId);
   return found ? found.index : -1;
 }
 

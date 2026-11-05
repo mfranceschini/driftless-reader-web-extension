@@ -12,6 +12,7 @@ import { Player } from './Player';
 import { useReadAloud } from './useReadAloud';
 import { onReaderCommand } from '../command-bus';
 import { MESSAGES } from '@/src/lib/messages';
+import { isTrustedEvent } from '../security';
 import type { ReaderCommand } from '@/src/lib/commands';
 import { useChunkMode } from './useChunkMode';
 import { FocusBand } from './FocusBand';
@@ -97,6 +98,7 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   useEffect(() => {
     if (!settings.focusBand || settings.focusBandMode !== 'line') return;
     const onKey = (event: KeyboardEvent) => {
+      if (!isTrustedEvent(event)) return;
       if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       const target = event.composedPath()[0];
@@ -147,7 +149,8 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
   // (capture) so it works even if focus was lost, e.g. after the panel closes.
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== 'Escape') return;
+      // A page can't close the reader or dismiss cards with fake key events.
+      if (!isTrustedEvent(event) || event.key !== 'Escape') return;
       event.stopPropagation();
       if (driftCard) {
         dismissDrift();

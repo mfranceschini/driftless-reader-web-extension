@@ -13,6 +13,15 @@ declare global {
  * so it never runs on a page unless the user asks for it.
  * Each injection toggles the reader on/off.
  */
+/** Hostile or unusual pages must never crash the reader before it opens. */
+function safeIsReaderable(): boolean {
+  try {
+    return isProbablyReaderable(document);
+  } catch {
+    return false;
+  }
+}
+
 export default defineContentScript({
   registration: 'runtime',
   matches: [],
@@ -23,7 +32,7 @@ export default defineContentScript({
       return;
     }
 
-    const article = isProbablyReaderable(document) ? extractArticle(document) : null;
+    const article = safeIsReaderable() ? extractArticle(document) : null;
     window.__driftlessReader = mountReaderShell(article);
   },
 });

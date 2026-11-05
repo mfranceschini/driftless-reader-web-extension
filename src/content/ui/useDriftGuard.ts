@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { DriftDetector, type DriftEvent } from '@/src/lib/drift-detector';
 import type { DriftSensitivity } from '@/src/lib/settings';
 import type { AnchorRecap, SessionObserver } from './useReadingSession';
+import { isTrustedEvent, isTrustedPresenceEvent } from '../security';
 
 export type DriftCardState =
   | { kind: 'returned'; reason: 'away' | 'idle'; awayMs: number; recap: AnchorRecap }
@@ -74,12 +75,19 @@ export function useDriftGuard({
 
     // Presence comes from events (more reliable than polling hasFocus()):
     // leaving = tab hidden or window blurred; returning = visible and focused.
+    // Pages can fire fake blur/focus or input events; only real ones count,
+    // so a page can't trigger (or suppress) Drift Guard cards.
     const onPresence = () => detector.setPresent(isPresent(), performance.now());
-    const onBlur = () => detector.setPresent(false, performance.now());
-    const onFocus = () =>
+    const onBlur = (event: Event) => {
+      if (isTrustedPresenceEvent(event)) detector.setPresent(false, performance.now());
+    };
+    const onFocus = (event: Event) => {
+      if (!isTrustedPresenceEvent(event)) return;
       detector.setPresent(document.visibilityState === 'visible', performance.now());
+    };
     let lastActivity = 0;
-    const onActivity = () => {
+    const onActivity = (event: Event) => {
+      if (!isTrustedEvent(event)) return;
       const now = performance.now();
       if (now - lastActivity < 200) return; // throttle pointermove
       lastActivity = now;

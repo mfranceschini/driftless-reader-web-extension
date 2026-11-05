@@ -191,8 +191,9 @@ export function OptionsApp() {
         <section className="opt-card" aria-labelledby="data-heading">
           <h2 id="data-heading">Your data</h2>
           <p className="lead">
-            Everything stays in this browser. Nothing is sent anywhere — there are no accounts,
-            servers or analytics.
+            Everything stays in this browser — no accounts, servers or analytics. Reading positions
+            are stored as one-way hashes, not as page addresses or text. Only an
+            &quot;(online)&quot; Read Aloud voice sends the text being read to its provider.
           </p>
           <ul className="data-list">
             <li>

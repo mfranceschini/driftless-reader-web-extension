@@ -12,8 +12,7 @@ import {
 import { getVoices, pickVoice } from '../speech/voices';
 import type { ReadingBlock } from '../blocks';
 import { READING_LINE } from './useReadingSession';
-
-declare const __E2E__: boolean;
+import { isTrustedEvent, IS_E2E } from '../security';
 
 const SENTENCE_HIGHLIGHT = 'driftless-sentence';
 const WORD_HIGHLIGHT = 'driftless-word';
@@ -51,9 +50,7 @@ interface Options {
 }
 
 function createPort(): SpeechPort {
-  return typeof __E2E__ !== 'undefined' && __E2E__
-    ? createFakeSpeechPort()
-    : createSpeechSynthesisPort();
+  return IS_E2E ? createFakeSpeechPort() : createSpeechSynthesisPort();
 }
 
 function setHighlight(name: string, range: Range | null) {
@@ -114,7 +111,7 @@ export function useReadAloud(options: Options) {
     if (sentences.length === 0) return null;
     dataRef.current = { sentences, maps };
 
-    const isE2E = typeof __E2E__ !== 'undefined' && __E2E__;
+    const isE2E = IS_E2E;
     voicesRef.current = isE2E ? [] : await getVoices();
     if (!isE2E && voicesRef.current.length === 0) {
       setState((s) => ({ ...s, unavailable: true }));
@@ -213,15 +210,16 @@ export function useReadAloud(options: Options) {
   useEffect(() => {
     if (!active) return;
     const content = options.contentRef.current;
-    const stopFollowing = () => {
-      if (!followingRef.current) return;
+    const stopFollowing = (event: Event) => {
+      if (!isTrustedEvent(event) || !followingRef.current) return;
       followingRef.current = false;
       setState((s) => ({ ...s, following: false }));
     };
     const onKey = (event: KeyboardEvent) => {
-      if (MANUAL_SCROLL_KEYS.has(event.key)) stopFollowing();
+      if (MANUAL_SCROLL_KEYS.has(event.key)) stopFollowing(event);
     };
     const onClick = (event: MouseEvent) => {
+      if (!isTrustedEvent(event)) return;
       const data = dataRef.current;
       const narrator = narratorRef.current;
       if (!data || !narrator || !content) return;

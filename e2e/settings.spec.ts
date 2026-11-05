@@ -123,7 +123,7 @@ test.describe('Options page', () => {
   test('forgetting reading positions needs a second click', async ({ context, serviceWorker }) => {
     await serviceWorker.evaluate(() =>
       chrome.storage.local.set({
-        positions: {
+        positionsV2: {
           'https://a.example/1': {
             anchor: 3,
             fingerprint: 'x',
@@ -147,8 +147,8 @@ test.describe('Options page', () => {
     await expect(options.getByText('2 saved reading positions')).toBeVisible();
     await options.getByRole('button', { name: 'Click again to forget' }).click();
     await expect(options.getByText('0 saved reading positions')).toBeVisible();
-    expect(await serviceWorker.evaluate(() => chrome.storage.local.get('positions'))).toEqual({
-      positions: {},
+    expect(await serviceWorker.evaluate(() => chrome.storage.local.get('positionsV2'))).toEqual({
+      positionsV2: {},
     });
   });
 
