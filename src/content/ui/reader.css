@@ -73,6 +73,8 @@
 
 /* ---------- Focus View overlay ---------- */
 .reader {
+  /* The UI is English (LTR) even on RTL pages; the article sets its own dir. */
+  direction: ltr;
   position: fixed;
   inset: 0;
   z-index: 2147483646;
@@ -332,8 +334,8 @@
 }
 
 .content blockquote {
-  padding-left: 1em;
-  border-left: 4px solid var(--rule);
+  padding-inline-start: 1em;
+  border-inline-start: 4px solid var(--rule);
   color: var(--muted);
 }
 
@@ -489,7 +491,7 @@
 .content .dl-anchor::before {
   content: '';
   position: absolute;
-  left: -18px;
+  inset-inline-start: -18px; /* left in LTR, right in RTL articles */
   top: 0.25em;
   bottom: 0.25em;
   width: 4px;
@@ -625,8 +627,9 @@
 .drift-quote {
   margin: 0 0 14px;
   padding: 8px 12px;
-  border-left: 3px solid var(--anchor);
-  border-radius: 0 8px 8px 0;
+  border-inline-start: 3px solid var(--anchor);
+  border-start-end-radius: 8px;
+  border-end-end-radius: 8px;
   background: var(--anchor-soft);
   font-family: var(--font);
   font-size: 15px;

@@ -1,0 +1,74 @@
+[
+  {
+    "url": "https://en.wikipedia.org/wiki/Attention_deficit_hyperactivity_disorder",
+    "expect": "article",
+    "note": "Long encyclopedia article"
+  },
+  {
+    "url": "https://pt.wikipedia.org/wiki/Transtorno_do_d%C3%A9fice_de_aten%C3%A7%C3%A3o_com_hiperatividade",
+    "expect": "article",
+    "note": "Portuguese"
+  },
+  {
+    "url": "https://ar.wikipedia.org/wiki/%D8%A7%D8%B6%D8%B7%D8%B1%D8%A7%D8%A8_%D9%86%D9%82%D8%B5_%D8%A7%D9%84%D8%A7%D9%86%D8%AA%D8%A8%D8%A7%D9%87_%D9%85%D8%B9_%D9%81%D8%B1%D8%B7_%D8%A7%D9%84%D9%86%D8%B4%D8%A7%D8%B7",
+    "expect": "article",
+    "note": "Arabic, right-to-left"
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter",
+    "expect": "article",
+    "note": "Docs with code samples"
+  },
+  {
+    "url": "https://react.dev/learn/thinking-in-react",
+    "expect": "article",
+    "note": "Docs, interactive sandboxes"
+  },
+  {
+    "url": "https://learn.microsoft.com/en-us/microsoft-edge/extensions/publish/publish-extension",
+    "expect": "article",
+    "note": "Microsoft docs"
+  },
+  {
+    "url": "https://docs.python.org/3/tutorial/introduction.html",
+    "expect": "article",
+    "note": "Docs, many code blocks"
+  },
+  {
+    "url": "https://web.dev/articles/vitals",
+    "expect": "article",
+    "note": "Tech article with images"
+  },
+  {
+    "url": "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
+    "expect": "article",
+    "note": "Long guide, many images"
+  },
+  {
+    "url": "https://paulgraham.com/greatwork.html",
+    "expect": "article",
+    "note": "Minimal HTML essay"
+  },
+  { "url": "https://github.com/mozilla/readability", "expect": "article", "note": "GitHub README" },
+  {
+    "url": "https://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-processing-an-unsorted-array",
+    "expect": "article",
+    "note": "Q&A with code"
+  },
+  {
+    "url": "https://www.gutenberg.org/files/1342/1342-h/1342-h.htm",
+    "expect": "article",
+    "note": "Whole novel (very large page)"
+  },
+  { "url": "https://blog.cloudflare.com/", "expect": "either", "note": "Blog index" },
+  {
+    "url": "https://www.theguardian.com/international",
+    "expect": "no-article",
+    "note": "News front page"
+  },
+  { "url": "https://g1.globo.com/", "expect": "no-article", "note": "Brazilian news front page" },
+  { "url": "https://news.ycombinator.com/", "expect": "no-article", "note": "Link list" },
+  { "url": "https://www.bbc.com/news", "expect": "no-article", "note": "News front page" },
+  { "url": "https://www.nngroup.com/articles/", "expect": "no-article", "note": "Article index" },
+  { "url": "https://www.smashingmagazine.com/", "expect": "no-article", "note": "Magazine home" }
+]

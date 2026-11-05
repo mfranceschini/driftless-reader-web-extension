@@ -17,6 +17,9 @@ export default defineConfig({
     // End-to-end tests can't "click" the toolbar to grant activeTab, so test
     // builds (E2E=1) get host access. Never set for store builds.
     ...(process.env.E2E === '1' ? { host_permissions: ['http://localhost/*'] } : {}),
+    // Real-site test runs (scripts/real-sites.mjs) need access to any site.
+    // Local only — scripts/verify-build.mjs rejects host permissions in store builds.
+    ...(process.env.REAL_SITES === '1' ? { host_permissions: ['<all_urls>'] } : {}),
     // No web_accessible_resources on purpose: anything listed there can be
     // fetched by any website, which lets sites detect the extension.
     // Strict CSP for our own pages (options, welcome, popup).

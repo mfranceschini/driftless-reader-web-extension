@@ -23,7 +23,8 @@
     "test:watch": "vitest",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test",
     "test:e2e": "E2E=1 wxt build -b chrome && playwright test",
-    "verify:build": "node scripts/verify-build.mjs"
+    "verify:build": "node scripts/verify-build.mjs",
+    "real-sites": "node scripts/real-sites.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
@@ -32,6 +33,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@eslint/js": "^10.0.1",
     "@fontsource-variable/atkinson-hyperlegible-next": "5.3.0",
     "@fontsource-variable/lexend": "5.3.0",

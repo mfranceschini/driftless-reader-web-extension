@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractArticle, sanitizeArticleHtml } from './extract';
+import { extractArticle, removeDuplicateTitle, sanitizeArticleHtml } from './extract';
 
 const paragraph = `<p>${'Reading with ADHD is hard when the mind drifts away from the page. '.repeat(10)}</p>`;
 
@@ -100,6 +100,24 @@ describe('sanitizeArticleHtml: attack payloads (page content is untrusted)', () 
     expect(clean).toContain('href="https://ok.example/a"');
     expect(clean).toContain('href="mailto:me@ok.example"');
     expect(clean).toContain('src="https://ok.example/i.png"');
+  });
+});
+
+describe('removeDuplicateTitle', () => {
+  it('removes a leading heading that repeats the title, in any script', () => {
+    expect(
+      removeDuplicateTitle('<h2>كيف تبقى مع مقال طويل</h2><p>نص</p>', 'كيف تبقى مع مقال طويل'),
+    ).toBe('<p>نص</p>');
+    expect(
+      removeDuplicateTitle('<div><h1>長い記事を読む</h1><p>本文</p></div>', '長い記事を読む'),
+    ).toBe('<div><p>本文</p></div>');
+  });
+
+  it('keeps headings that differ or come after body text', () => {
+    expect(removeDuplicateTitle('<h2>Other</h2><p>x</p>', 'Title')).toBe('<h2>Other</h2><p>x</p>');
+    expect(removeDuplicateTitle('<p>Intro</p><h2>Title</h2>', 'Title')).toBe(
+      '<p>Intro</p><h2>Title</h2>',
+    );
   });
 });
 

@@ -107,7 +107,8 @@ export function useReadAloud(options: Options) {
     // session may still be indexing paragraphs; give it a moment.
     const blocks = await waitForBlocks(getBlocks);
     const maps = blocks.map((b) => buildTextMap(b.el));
-    const sentences = buildSentences(maps, lang);
+    // Code blocks are skipped: hearing "pnpm install pnpm build" is noise.
+    const sentences = buildSentences(maps, lang).filter((s) => !isCode(blocks[s.block]!.el));
     if (sentences.length === 0) return null;
     dataRef.current = { sentences, maps };
 
@@ -262,6 +263,10 @@ export function useReadAloud(options: Options) {
   );
 
   return { state, start, toggle, stop, next, prev, follow };
+}
+
+function isCode(el: Element): boolean {
+  return el.tagName === 'PRE' || el.closest('pre') !== null;
 }
 
 async function waitForBlocks(getBlocks: () => ReadingBlock[], timeoutMs = 2000) {

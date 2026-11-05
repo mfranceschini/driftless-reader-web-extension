@@ -9,3 +9,4 @@ web-ext.config.ts
 .env.*
 playwright-report/
 test-results/
+real-sites-report/

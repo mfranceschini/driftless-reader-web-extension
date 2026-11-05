@@ -178,6 +178,37 @@ export function ReaderApp({ article, onClose: closeNow, onCloseStart }: ReaderAp
     setPassive(readAloud.state.status === 'playing');
   }, [readAloud.state.status, setPassive]);
 
+  // Focus View is a modal dialog: Tab / Shift+Tab cycle inside it instead of
+  // wandering into the (hidden) page underneath.
+  useEffect(() => {
+    const FOCUSABLE =
+      'button:not([disabled]), a[href], select, input, textarea, [tabindex]:not([tabindex="-1"])';
+    function onTab(event: KeyboardEvent) {
+      if (event.key !== 'Tab' || !isTrustedEvent(event)) return;
+      const container = containerRef.current;
+      if (!container) return;
+      const items = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+        (el) => el.offsetParent !== null || el.getClientRects().length > 0,
+      );
+      if (items.length === 0) return;
+      const root = container.getRootNode() as ShadowRoot;
+      const active = root.activeElement as HTMLElement | null;
+      const index = active ? items.indexOf(active) : -1;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      let target: HTMLElement | null = null;
+      if (index === -1) target = event.shiftKey ? last : first;
+      else if (event.shiftKey && index === 0) target = last;
+      else if (!event.shiftKey && index === items.length - 1) target = first;
+      if (target) {
+        event.preventDefault();
+        target.focus();
+      }
+    }
+    document.addEventListener('keydown', onTab, true);
+    return () => document.removeEventListener('keydown', onTab, true);
+  }, []);
+
   // Esc closes a card or the panel first, then the reader. Listen at the document level
   // (capture) so it works even if focus was lost, e.g. after the panel closes.
   useEffect(() => {

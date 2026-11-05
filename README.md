@@ -42,6 +42,7 @@ pnpm dev          # opens Edge with the extension loaded (hot reload)
 pnpm dev:chrome   # same, in Chrome
 pnpm check        # typecheck + lint + format check + unit tests
 pnpm test:e2e     # end-to-end tests in Chromium with the extension loaded
+pnpm real-sites   # open ~20 real websites with the extension and write a report
 pnpm zip          # store-ready zips for Edge and Chrome in .output/
 ```
 
@@ -51,6 +52,23 @@ pnpm zip          # store-ready zips for Edge and Chrome in .output/
 2. Edge: open `edge://extensions` → enable **Developer mode** → **Load unpacked** → select `.output/edge-mv3`.
    Chrome: `chrome://extensions` → **Developer mode** → **Load unpacked** → `.output/chrome-mv3`.
 3. Open any article and click the toolbar icon, or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>.
+
+### Keyboard shortcuts
+
+| Shortcut                                     | Action                           |
+| -------------------------------------------- | -------------------------------- |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> | Open / close Driftless Reader    |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Read Aloud: start, pause, resume |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Focus band on / off              |
+| <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> | Chunk mode on / off              |
+
+Change them at `edge://extensions/shortcuts` (or `chrome://extensions/shortcuts`). Inside the reader: <kbd>Esc</kbd> closes, <kbd>Space</kbd> / <kbd>Shift</kbd>+<kbd>Space</kbd> move between chunks, <kbd>↑</kbd>/<kbd>↓</kbd> move one line with the focus band.
+
+### Testing notes
+
+- End-to-end tests include accessibility (axe, WCAG 2.2 AA), security, and edge cases (RTL, Portuguese, docs with code, a 15k-word article with a scroll-performance check).
+- If your installed Chromium doesn't match Playwright's expected build, set `PW_CHROMIUM_PATH=/path/to/chrome`.
+- `pnpm real-sites` needs network access; list in `scripts/real-sites.json`, report in `real-sites-report/`.
 
 ### Stack
 

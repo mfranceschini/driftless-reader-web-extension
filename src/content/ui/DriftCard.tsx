@@ -39,7 +39,9 @@ export function DriftCard({ card, onRewind, onDismiss, onMuteSkimming }: DriftCa
         <p className="drift-section">{recap.section}</p>
       )}
       <div className="card-actions">
-        <button type="button" className="btn primary" onClick={onRewind} autoFocus>
+        {/* No autoFocus: the card can appear while you're pressing Space to
+            move through chunks, and must not turn that press into "Rewind". */}
+        <button type="button" className="btn primary" onClick={onRewind}>
           {card.kind === 'skimming' ? 'Back to anchor' : 'Rewind to there'}
         </button>
         {card.kind === 'skimming' ? (

@@ -79,6 +79,7 @@ kbd {
   padding: 1px 6px;
   border-radius: 4px;
   background: var(--kbd-bg);
+  color: var(--fg); /* full-contrast text, even inside muted hints */
   font: inherit;
   font-size: 12px;
 }

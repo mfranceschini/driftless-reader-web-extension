@@ -55,6 +55,34 @@ export function sanitizeArticleHtml(html: string): string {
   });
 }
 
+const normalizeHeading = (text: string) =>
+  text
+    .normalize('NFKC')
+    .replace(/[\s\p{P}]+/gu, ' ')
+    .trim()
+    .toLowerCase();
+
+/**
+ * Removes a leading heading that repeats the article title (we show the
+ * title separately). Readability does this itself, but only compares Latin
+ * letters, so Arabic, Hebrew, CJK, Cyrillic… titles appeared twice.
+ */
+export function removeDuplicateTitle(html: string, title: string): string {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const firstHeading = template.content.querySelector('h1, h2');
+  const firstText = template.content.textContent?.trim() ?? '';
+  if (
+    firstHeading &&
+    normalizeHeading(firstHeading.textContent ?? '') === normalizeHeading(title) &&
+    firstText.startsWith((firstHeading.textContent ?? '').trim())
+  ) {
+    firstHeading.remove();
+    return template.innerHTML;
+  }
+  return html;
+}
+
 /** Very large pages are skipped instead of freezing the tab (hostile or huge DOMs). */
 export const MAX_ELEMENTS_TO_PARSE = 60_000;
 
@@ -77,13 +105,14 @@ export function extractArticle(doc: Document): Article | null {
   }
   if (!parsed?.content) return null;
 
-  const html = sanitizeArticleHtml(parsed.content);
+  const title = parsed.title?.trim() || doc.title || 'Untitled';
+  const html = removeDuplicateTitle(sanitizeArticleHtml(parsed.content), title);
   const text = parsed.textContent ?? '';
   const wordCount = countWords(text);
   if (wordCount === 0) return null;
 
   return {
-    title: parsed.title?.trim() || doc.title || 'Untitled',
+    title,
     byline: parsed.byline?.trim() || null,
     siteName: parsed.siteName?.trim() || null,
     html,
