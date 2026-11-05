@@ -17,6 +17,8 @@ interface DisplayPanelProps {
   onChange(next: ReaderSettings): void;
   /** Article language, to list matching voices first. */
   lang?: string | null;
+  /** Shows a link to the full options page (hidden on the options page itself). */
+  onOpenAllSettings?(): void;
 }
 
 const THEMES: { value: Theme; label: string; text?: string }[] = [
@@ -134,7 +136,7 @@ function Segmented<T extends string>({
   );
 }
 
-export function DisplayPanel({ settings, onChange, lang }: DisplayPanelProps) {
+export function DisplayPanel({ settings, onChange, lang, onOpenAllSettings }: DisplayPanelProps) {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   useEffect(() => {
     let active = true;
@@ -287,6 +289,11 @@ export function DisplayPanel({ settings, onChange, lang }: DisplayPanelProps) {
           value={settings.driftSensitivity}
           onSelect={(v) => set('driftSensitivity', v)}
         />
+      )}
+      {onOpenAllSettings && (
+        <button type="button" className="disclosure all-settings" onClick={onOpenAllSettings}>
+          All settings, shortcuts &amp; data →
+        </button>
       )}
     </div>
   );

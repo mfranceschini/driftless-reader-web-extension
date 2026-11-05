@@ -44,7 +44,7 @@ pnpm zip          # store-ready zips for Edge and Chrome in .output/
 1. `pnpm build`
 2. Edge: open `edge://extensions` → enable **Developer mode** → **Load unpacked** → select `.output/edge-mv3`.
    Chrome: `chrome://extensions` → **Developer mode** → **Load unpacked** → `.output/chrome-mv3`.
-3. Open any article and click the toolbar icon, or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>.
+3. Open any article and click the toolbar icon, or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>.
 
 ### Stack
 

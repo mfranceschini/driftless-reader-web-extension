@@ -1054,3 +1054,9 @@
     backdrop-filter: none;
   }
 }
+
+.all-settings {
+  margin-top: 4px;
+  padding-top: 12px;
+  color: var(--accent);
+}

@@ -104,10 +104,11 @@ export function useReadAloud(options: Options) {
   }, []);
 
   /** Lazily builds the sentence list from the indexed reading blocks. */
-  const ensureNarrator = useCallback(async (): Promise<Narrator | null> => {
-    if (narratorRef.current) return narratorRef.current;
+  const createNarrator = useCallback(async (): Promise<Narrator | null> => {
     const { getBlocks, lang, rate, voiceURI } = optionsRef.current;
-    const blocks = getBlocks();
+    // Right after opening (e.g. via the Read Aloud shortcut) the reading
+    // session may still be indexing paragraphs; give it a moment.
+    const blocks = await waitForBlocks(getBlocks);
     const maps = blocks.map((b) => buildTextMap(b.el));
     const sentences = buildSentences(maps, lang);
     if (sentences.length === 0) return null;
@@ -153,6 +154,16 @@ export function useReadAloud(options: Options) {
     setState((s) => ({ ...s, total: sentences.length }));
     return narrator;
   }, [scrollSentenceIntoView]);
+
+  const creatingRef = useRef<Promise<Narrator | null> | null>(null);
+  const ensureNarrator = useCallback((): Promise<Narrator | null> => {
+    if (narratorRef.current) return Promise.resolve(narratorRef.current);
+    // Two quick presses must not create two narrators (two voices at once).
+    creatingRef.current ??= createNarrator().finally(() => {
+      creatingRef.current = null;
+    });
+    return creatingRef.current;
+  }, [createNarrator]);
 
   /** First sentence of the block currently under the reading line. */
   const sentenceAtReadingLine = useCallback(() => {
@@ -253,6 +264,16 @@ export function useReadAloud(options: Options) {
   );
 
   return { state, start, toggle, stop, next, prev, follow };
+}
+
+async function waitForBlocks(getBlocks: () => ReadingBlock[], timeoutMs = 2000) {
+  const start = performance.now();
+  let blocks = getBlocks();
+  while (blocks.length === 0 && performance.now() - start < timeoutMs) {
+    await new Promise((resolve) => window.setTimeout(resolve, 50));
+    blocks = getBlocks();
+  }
+  return blocks;
 }
 
 /** Text position under the pointer, piercing our shadow root. */

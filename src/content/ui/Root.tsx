@@ -3,6 +3,7 @@ import { extractArticle, type Article } from '@/src/content/extract';
 import { NoArticlePill } from './NoArticlePill';
 import { ReaderApp } from './ReaderApp';
 import { PageFocusBand } from './PageFocusBand';
+import { onReaderCommand } from '../command-bus';
 import { DEFAULT_SETTINGS } from '@/src/lib/settings';
 import { loadSettings, watchSettings } from '@/src/lib/settings-store';
 
@@ -54,6 +55,14 @@ function RootContent({ initialArticle, onClose }: RootProps) {
   const [article, setArticle] = useState<Article | null>(initialArticle);
   const [failed, setFailed] = useState(false);
   const [pageBand, setPageBand] = useState(false);
+
+  // Without an article, the focus-band shortcut works on the page itself.
+  useEffect(() => {
+    if (article) return;
+    return onReaderCommand((command) => {
+      if (command === 'focus-band') setPageBand((on) => !on);
+    });
+  }, [article]);
   usePageScrollLock(article !== null);
 
   if (article) return <ReaderApp article={article} onClose={onClose} />;

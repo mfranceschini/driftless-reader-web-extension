@@ -99,3 +99,19 @@ kbd {
   grid-row: span 2;
   border-radius: 10px;
 }
+
+.link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}

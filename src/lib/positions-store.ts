@@ -54,3 +54,18 @@ export async function loadReadingSpeed(): Promise<number> {
 export async function saveReadingSpeed(wpm: number): Promise<void> {
   await speedItem.setValue(Math.round(wpm));
 }
+
+/** How many articles have a saved position. */
+export async function countPositions(): Promise<number> {
+  return Object.keys(await positionsItem.getValue()).length;
+}
+
+/** Forgets every saved reading position. */
+export async function clearAllPositions(): Promise<void> {
+  await positionsItem.setValue({});
+}
+
+/** Forgets the learned reading speed (back to the average). */
+export async function resetReadingSpeed(): Promise<void> {
+  await speedItem.removeValue();
+}

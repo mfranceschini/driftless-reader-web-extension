@@ -12,8 +12,8 @@ Each phase ends with a build the test user loads unpacked in Edge and uses on re
 | 4   | Read Aloud                      | Sentence-by-sentence speech, sentence + word highlights (CSS Highlight API), auto-follow, click-to-jump, speed & voice                                      | ✅     |
 | 5   | Focus band & Chunk mode         | Focus band (1/3/5 lines, reading-line or mouse; also on non-article pages), Chunk mode (Space / Shift+Space)                                                | ✅     |
 | 5.5 | Glass effects                   | Frosted glass on floating controls only (on by default, toggle), solid fallback for reduce-transparency / forced colors, automated worst-case contrast test | ✅     |
-| 6   | Settings                        | Options page, keyboard shortcuts, onboarding                                                                                                                | ⏳     |
-| 7   | Polish                          | Accessibility pass, ~20-site test corpus, performance                                                                                                       |        |
+| 6   | Settings                        | Options page (live preview, voice test, shortcuts, data reset), 4 customizable shortcuts, welcome page, popup settings link                                 | ✅     |
+| 7   | Polish                          | Accessibility pass, ~20-site test corpus, performance                                                                                                       | ⏳     |
 | 8   | Store submission                | Icons, screenshots, privacy policy page, Edge Add-ons + Chrome Web Store listings                                                                           |        |
 
 ## Deferred to v1.1

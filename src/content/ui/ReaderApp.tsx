@@ -1,20 +1,7 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import type { Article } from '@/src/content/extract';
 import { formatTimeLeft } from '@/src/lib/reading-time';
-import {
-  DEFAULT_SETTINGS,
-  LINE_WIDTH_CH,
-  stepSetting,
-  type ReaderSettings,
-} from '@/src/lib/settings';
-import { loadSettings, saveSettings, watchSettings } from '@/src/lib/settings-store';
+import { LINE_WIDTH_CH, stepSetting } from '@/src/lib/settings';
 import { pageKey } from '@/src/lib/page-key';
 import { ProgressBar } from './ProgressBar';
 import { AnchorButton, ResumeCard } from './AnchorControls';
@@ -23,37 +10,19 @@ import { useDriftGuard } from './useDriftGuard';
 import { DriftCard } from './DriftCard';
 import { Player } from './Player';
 import { useReadAloud } from './useReadAloud';
+import { onReaderCommand } from '../command-bus';
+import { MESSAGES } from '@/src/lib/messages';
+import type { ReaderCommand } from '@/src/lib/commands';
 import { useChunkMode } from './useChunkMode';
 import { FocusBand } from './FocusBand';
 import { ChunkNav } from './ChunkNav';
 import { DisplayPanel } from './DisplayPanel';
+import { useReaderSettings } from './useReaderSettings';
 import { ensureFont, FONT_STACKS } from '../fonts';
 
 export interface ReaderAppProps {
   article: Article;
   onClose(): void;
-}
-
-/** Keeps settings in sync with storage (so popup changes apply live). */
-function useReaderSettings() {
-  const [settings, setSettings] = useState<ReaderSettings>(DEFAULT_SETTINGS);
-
-  useEffect(() => {
-    let active = true;
-    loadSettings().then((loaded) => active && setSettings(loaded));
-    const unwatch = watchSettings(setSettings);
-    return () => {
-      active = false;
-      unwatch();
-    };
-  }, []);
-
-  const update = useCallback((next: ReaderSettings) => {
-    setSettings(next);
-    void saveSettings(next);
-  }, []);
-
-  return [settings, update] as const;
 }
 
 export function ReaderApp({ article, onClose }: ReaderAppProps) {
@@ -152,6 +121,22 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
     voiceURI: settings.readAloudVoice,
   });
   const playerOpen = readAloud.state.status !== 'idle';
+
+  // Keyboard commands from the browser (customizable shortcuts).
+  const commandHandlerRef = useRef<(command: ReaderCommand) => void>(() => {});
+  useEffect(() => {
+    commandHandlerRef.current = (command) => {
+      if (command === 'read-aloud') {
+        if (playerOpen) readAloud.toggle();
+        else void readAloud.start();
+      } else if (command === 'focus-band') {
+        updateSettings({ ...settings, focusBand: !settings.focusBand });
+      } else if (command === 'chunk-mode') {
+        updateSettings({ ...settings, chunkMode: !settings.chunkMode });
+      }
+    };
+  });
+  useEffect(() => onReaderCommand((command) => commandHandlerRef.current(command)), []);
 
   // Listening counts as reading: Drift Guard stays quiet while the voice plays.
   useEffect(() => {
@@ -298,7 +283,12 @@ export function ReaderApp({ article, onClose }: ReaderAppProps) {
       {/* Outside the top bar on purpose: a backdrop-filter on an ancestor
           would stop the panel's glass from blurring the article behind it. */}
       {panelOpen && (
-        <DisplayPanel settings={settings} onChange={updateSettings} lang={article.lang} />
+        <DisplayPanel
+          settings={settings}
+          onChange={updateSettings}
+          lang={article.lang}
+          onOpenAllSettings={() => void browser.runtime.sendMessage({ type: MESSAGES.openOptions })}
+        />
       )}
 
       {state.resumeOffer && (

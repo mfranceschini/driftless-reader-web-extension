@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MESSAGES, type ActivateMessage, type ActivateResponse } from '@/src/lib/messages';
 
 type Status = 'idle' | 'working' | 'error';
 
+function useToggleShortcut(): string[] {
+  const [keys, setKeys] = useState<string[]>([]);
+  useEffect(() => {
+    void browser.commands.getAll().then((all) => {
+      const combo = all.find((c) => c.name === 'toggle-reader')?.shortcut;
+      setKeys(combo ? combo.split('+') : []);
+    });
+  }, []);
+  return keys;
+}
+
 export function App() {
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string>();
+  const shortcut = useToggleShortcut();
 
   async function handleToggle() {
     setStatus('working');
@@ -45,8 +57,31 @@ export function App() {
       </button>
 
       <p className="hint">
-        Shortcut: <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>
+        {shortcut.length > 0 ? (
+          <>
+            Shortcut:{' '}
+            {shortcut.map((key, i) => (
+              <span key={key + i}>
+                {i > 0 && ' + '}
+                <kbd>{key}</kbd>
+              </span>
+            ))}
+          </>
+        ) : (
+          'No shortcut set — add one in Settings.'
+        )}
       </p>
+
+      <button
+        type="button"
+        className="link"
+        onClick={() => {
+          void browser.runtime.openOptionsPage();
+          window.close();
+        }}
+      >
+        Settings, shortcuts &amp; data
+      </button>
 
       {error && (
         <p className="error" role="alert">

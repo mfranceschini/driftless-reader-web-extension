@@ -22,10 +22,26 @@ export default defineConfig({
     action: {
       default_title: 'Driftless Reader',
     },
+    // Up to four commands can suggest a default key; all are changeable at
+    // edge://extensions/shortcuts (or chrome://extensions/shortcuts).
+    // Chromium silently skips suggestions that clash with its own shortcuts
+    // (Alt+Shift+R and Alt+Shift+C did), so these were verified to register.
     commands: {
       'toggle-reader': {
-        suggested_key: { default: 'Alt+Shift+R' },
+        suggested_key: { default: 'Alt+Shift+D' },
         description: 'Start or stop Driftless Reader on this page',
+      },
+      'read-aloud': {
+        suggested_key: { default: 'Alt+Shift+S' },
+        description: 'Read aloud: start, pause or resume',
+      },
+      'focus-band': {
+        suggested_key: { default: 'Alt+Shift+F' },
+        description: 'Turn the focus band on or off',
+      },
+      'chunk-mode': {
+        suggested_key: { default: 'Alt+Shift+K' },
+        description: 'Turn Chunk mode on or off',
       },
     },
   },
