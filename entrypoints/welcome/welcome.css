@@ -114,3 +114,10 @@
   justify-content: center;
   margin-top: 24px;
 }
+
+.support-note {
+  margin: 28px 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}

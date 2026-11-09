@@ -31,4 +31,7 @@ PRIVATE BY DESIGN
 FREE AND OPEN SOURCE
 MIT licensed. Source code, issues and suggestions: https://github.com/mfranceschini/driftless-reader-web-extension
 
+ENJOYING IT?
+Driftless Reader is free and always will be. If it helps you, you can support the project at https://buymeacoffee.com/mathpfran
+
 Driftless Reader is a reading aid, not a medical device or treatment. Everyone reads differently — try the tools and keep what helps.

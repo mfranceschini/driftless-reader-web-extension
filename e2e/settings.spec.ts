@@ -111,6 +111,17 @@ test.describe('Options page', () => {
     );
   });
 
+  test('About links to the source, issues and the support page', async ({
+    context,
+    serviceWorker,
+  }) => {
+    const options = await openExtensionPage(context, serviceWorker, 'options.html');
+    const support = options.getByRole('link', { name: /Support the project/ });
+    await expect(support).toHaveAttribute('href', 'https://buymeacoffee.com/mathpfran');
+    await expect(support).toHaveAttribute('target', '_blank');
+    await expect(support).toHaveAttribute('rel', /noreferrer/);
+  });
+
   test('lists all four shortcuts', async ({ context, serviceWorker }) => {
     const options = await openExtensionPage(context, serviceWorker, 'options.html');
     const table = options.locator('table.keys').first();
@@ -180,6 +191,10 @@ test.describe('Welcome page', () => {
       welcome.getByRole('heading', { name: 'Welcome to Driftless Reader' }),
     ).toBeVisible();
     await expect(welcome.getByRole('heading', { name: 'Pin it to your toolbar' })).toBeVisible();
+    await expect(welcome.getByRole('link', { name: /buy me a coffee/ })).toHaveAttribute(
+      'href',
+      'https://buymeacoffee.com/mathpfran',
+    );
     await welcome.getByRole('button', { name: /Serif/ }).click();
     await welcome.getByRole('button', { name: /Eager/ }).click();
     await expect(welcome.getByRole('button', { name: /Eager/ })).toHaveAttribute(

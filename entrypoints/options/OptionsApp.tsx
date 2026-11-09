@@ -12,10 +12,9 @@ import {
   resetReadingSpeed,
 } from '@/src/lib/positions-store';
 import { ConfirmButton } from '@/src/pages/ConfirmButton';
+import { ISSUES_URL, REPO_URL, SUPPORT_URL } from '@/src/lib/links';
 import { Preview } from '@/src/pages/Preview';
 import { useReaderStyles } from '@/src/pages/ReaderStyles';
-
-const REPO = 'https://github.com/mfranceschini/driftless-reader-web-extension';
 
 const IN_READER_KEYS: [string, string][] = [
   ['Esc', 'Close a card, then the panel, then the reader'],
@@ -249,13 +248,16 @@ export function OptionsApp() {
             Hyperlegible Next (SIL Open Font License).
           </p>
           <div className="row-actions">
-            <a href={REPO} target="_blank" rel="noreferrer">
+            <a href={REPO_URL} target="_blank" rel="noreferrer">
               Source code
             </a>
-            <a href={`${REPO}/issues`} target="_blank" rel="noreferrer">
+            <a href={ISSUES_URL} target="_blank" rel="noreferrer">
               Report a problem
             </a>
             <a href={browser.runtime.getURL('/welcome.html')}>Welcome guide</a>
+            <a href={SUPPORT_URL} target="_blank" rel="noreferrer">
+              Support the project ☕
+            </a>
           </div>
         </section>
       </div>

@@ -74,6 +74,10 @@ Change them at `edge://extensions/shortcuts` (or `chrome://extensions/shortcuts`
 
 [WXT](https://wxt.dev) · TypeScript · React · [Mozilla Readability](https://github.com/mozilla/readability) · Vitest · Manifest V3
 
+## Support
+
+Driftless Reader is free and open source. If it helps you, you can [buy me a coffee ☕](https://buymeacoffee.com/mathpfran).
+
 ## License
 
 [MIT](LICENSE). Third-party licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

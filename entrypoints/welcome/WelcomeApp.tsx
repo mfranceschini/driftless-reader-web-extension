@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ensureFont, FONT_STACKS } from '@/src/content/fonts';
 import { useReaderSettings } from '@/src/content/ui/useReaderSettings';
 import type { DriftSensitivity, FontFamily } from '@/src/lib/settings';
+import { SUPPORT_URL } from '@/src/lib/links';
 
 const FONTS: { value: FontFamily; label: string }[] = [
   { value: 'lexend', label: 'Lexend' },
@@ -151,6 +152,13 @@ export function WelcomeApp() {
           All settings
         </button>
       </div>
+
+      <p className="support-note">
+        Driftless Reader is free and open source. If it helps you, you can{' '}
+        <a href={SUPPORT_URL} target="_blank" rel="noreferrer">
+          buy me a coffee ☕
+        </a>
+      </p>
     </div>
   );
 }

@@ -41,6 +41,10 @@ Choose a voice without "(online)" to keep everything on your device.
 The extension itself makes no network requests. Fonts are bundled inside the extension. Images in
 Focus View load from the original website, exactly as they would on the page itself.
 
+Links on the extension's settings and welcome pages (source code, issues, and the optional
+"Support the project" / Buy Me a Coffee page) simply open the website in a normal tab. The extension
+shares no data with those sites.
+
 ## Permissions
 
 | Permission  | Why                                                              |
