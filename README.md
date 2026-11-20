@@ -4,6 +4,8 @@
 
 # Driftless Reader
 
+[![CI](https://github.com/mfranceschini/driftless-reader-web-extension/actions/workflows/ci.yml/badge.svg)](https://github.com/mfranceschini/driftless-reader-web-extension/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](LICENSE)
+
 An open-source **Microsoft Edge and Chrome extension** that helps people with ADHD stay with an article from start to finish.
 
 Most reading tools change how text _looks_. Driftless Reader focuses on what actually breaks reading for many ADHD readers: **drifting away halfway through** and losing your place.
